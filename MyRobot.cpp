@@ -3,7 +3,10 @@
 // Constants.h has the mappings for PWM, Digital IO Channels, etc.
 #include "Constants.h"
 #include "Sweeper.h"
+#include "ToggleButton.hpp"
+#include "TestHarness.h"
 
+#define TEST_MODE
 
 #include <stdio.h>
 
@@ -24,7 +27,11 @@ class RobotDemo : public SimpleRobot
 public:
 	RobotDemo(void){
 		leroyDrive = new RobotDrive(PWM_LEFT_DRIVE, PWM_RIGHT_DRIVE);
-		leroyDrive->SetExpiration(0.1);
+		
+		sweeper = new Sweeper(SPIKE_SWEEPER);
+		leroyDrive->SetExpiration(1.1);
+		
+		joystickOne = new Joystick(1);
 
 	}
 
@@ -46,16 +53,47 @@ public:
 	 */
 	void OperatorControl(void)
 	{
-
-		leroyDrive->SetSafetyEnabled(true);
+		leroyDrive->SetSafetyEnabled(false);
+		printf("Starting op con!");
+		
+#ifdef TEST_MODE
+		printf("Test mode!\n");
+		TestHarness *testHarness = new TestHarness(joystickOne);
+#endif
+		
+#ifndef TEST_MODE
+		
+		Relay *belt = new Relay(3);
+		belt->Set(Relay::kReverse);
+		
+		Relay *trigger = new Relay(SPIKE_TRIGGER);
+		trigger->Set(Relay::kForward);
+		
+		Jaguar *bjr = new Jaguar(10);
+		Jaguar *bjl = new Jaguar(9);
+		
+		bjl->Set(-0.35);
+		bjr->Set(-0.35);
+		
+#endif
+		
+		
+		//leroyDrive->SetSafetyEnabled(true);
 		while (IsOperatorControl())
 		{
 			
+#ifndef TEST_MODE
+			sweeper->On();
 			// Use left and right joysticks on Gamepad One
 		    leroyDrive->TankDrive(joystickOne->GetRawAxis(GPAD_LEFT_Y_RAW_AXIS) * JOYSTICK_DRIVE_SCALE_FACTOR, 
 		    		joystickOne->GetRawAxis(GPAD_RIGHT_Y_RAW_AXIS) * JOYSTICK_DRIVE_SCALE_FACTOR); 
 		    
+#endif
+#ifdef TEST_MODE
 		    
+		    testHarness->victorOneValue = joystickOne->GetRawAxis(GPAD_LEFT_Y_RAW_AXIS);
+		    testHarness->Update();
+#endif
 
 			Wait(0.005);				// wait for a motor update time
 		}

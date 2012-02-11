@@ -35,8 +35,8 @@
 
 // Spike Shannels
 
-#define		SPIKE_SWEEPER		1
-#define		SPIKE_TRIGGER		2
+#define		SPIKE_SWEEPER		2
+#define		SPIKE_TRIGGER		7
 
 
 

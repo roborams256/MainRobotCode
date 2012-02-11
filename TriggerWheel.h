@@ -18,6 +18,7 @@ private:
 	
 	Relay *triggerRelay;
 	double launchPeriod;
+	bool semi;
 	Timer *timer;
 	
 public:
@@ -27,5 +28,6 @@ public:
 	void fireAuto(void);
 	void fireSemiAuto(void);
 	void setLaunchPeriod(double launchTime);
+	void Update(void);
 	
 };
