@@ -1,4 +1,5 @@
 #include "WPILib.h"
+//#include <math.h>
 
 // Constants.h has the mappings for PWM, Digital IO Channels, etc.
 #include "Constants.h"
@@ -33,6 +34,7 @@ public:
 		leroyDrive->SetExpiration(1.1);
 		
 		joystickOne = new Joystick(1);
+		joystickTwo = new Joystick(2);
 
 	}
 
@@ -64,20 +66,36 @@ public:
 		
 #ifndef TEST_MODE
 		
-		Relay *belt = new Relay(3);
-		belt->Set(Relay::kReverse);
+		//Relay *belt = new Relay(3);
+		//belt->Set(Relay::kReverse);
+		
+		
 		
 		//Relay *trigger = new Relay(SPIKE_TRIGGER);
 		//trigger->Set(Relay::kForward);
-		TriggerWheel *trigger = new TriggerWheel(1, 1);
+		TriggerWheel *trigger = new TriggerWheel(1, 0.1);
+		ToggleButton *beltbutton = new ToggleButton(joystickOne, 3, 2);
 		
 		Jaguar *bjr = new Jaguar(10);
 		Jaguar *bjl = new Jaguar(9);
+		Jaguar *belt = new Jaguar(7);
 		
-		bjl->Set(-0.35);
-		bjr->Set(-0.35);
+		Jaguar *angle = new Jaguar(8);
+		
+		angle->Set(0.0);
+				
+		float beltSpeed = -0.75;
+		float ballSpeed = -0.5;
+		
+		belt->Set(beltSpeed);
+		
+		bjl->Set(ballSpeed);
+		bjr->Set(ballSpeed);
+		
+		
 		
 #endif
+		
 		
 		
 		//leroyDrive->SetSafetyEnabled(true);
@@ -90,15 +108,45 @@ public:
 		    leroyDrive->TankDrive(joystickOne->GetRawAxis(GPAD_LEFT_Y_RAW_AXIS) * JOYSTICK_DRIVE_SCALE_FACTOR, 
 		    		joystickOne->GetRawAxis(GPAD_RIGHT_Y_RAW_AXIS) * JOYSTICK_DRIVE_SCALE_FACTOR); 
 		    
+		    /*if (joystickOne->GetRawButton(2) && !trigger->pulsing())
+		    	trigger->firePulse();
+		    else if (!joystickOne->GetRawButton(2) && trigger->pulsing())
+		    	trigger->stopPulse();*/
+		    
 		    if (joystickOne->GetRawButton(2))
 		    	trigger->fireSemiAuto();
 		    
 		    trigger->Update();
 		    
+		    float jLspeed = -0.5*(1 + joystickTwo->GetRawAxis(GPAD_LEFT_Y_RAW_AXIS));
+		    float jRspeed = -0.5*(1 + joystickTwo->GetRawAxis(GPAD_RIGHT_Y_RAW_AXIS));
+		    
+		    printf("StickL: %1.2f | Belt speed: %1.2f | StickR: %1.2f | Ball Speed: %1.2f\n", jLspeed, beltSpeed, jRspeed, ballSpeed);
+		    
+		    if (joystickTwo->GetRawButton(1)){
+		    	beltSpeed = jLspeed;
+		    	belt->Set(beltSpeed);
+		    }
+		    	
+		    if (joystickTwo->GetRawButton(2)){
+		    		    	ballSpeed = jRspeed;
+		    		    	bjl->Set(ballSpeed);
+		    		    	bjr->Set(ballSpeed);
+		    		    }
+		    
+		   
+		    float t2 = joystickTwo->GetThrottle();
+		    if ( (t2 >0.05) || (t2<-0.05) ) {
+		    	angle->Set(t2*0.15);
+		    }
+		    else
+		    	angle->Set(0.0);
+		    
+		    
 #endif
 #ifdef TEST_MODE
 		    
-		    testHarness->victorOneValue = joystickOne->GetRawAxis(GPAD_LEFT_Y_RAW_AXIS);
+		    
 		    testHarness->Update();
 #endif
 

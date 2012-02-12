@@ -10,6 +10,7 @@ public:
 	Joystick *joystick;
 	ToggleButton *toggleButton;
 	TriggerWheel *wheel;
+	DigitalInput *digInput;
 	
 	float victorOneValue;
 	float victorTwoValue;

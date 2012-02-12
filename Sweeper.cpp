@@ -11,7 +11,7 @@ Sweeper::Sweeper(int channelA)
 	
 	isOn = false;
 	
-	printf("Sweeper initted on channels %d and %d\n", channelA);
+	printf("Sweeper initted on channels %d\n", channelA);
 
 }
 
@@ -21,7 +21,7 @@ void Sweeper::On(void)
 	
 	relayA->Set(motorADirection);
 	isOn = true;
-	printf("Sweeper on!\n");
+	//printf("Sweeper on!\n");
 }
 
 void Sweeper::Reverse(void)
@@ -37,7 +37,7 @@ void Sweeper::Off(void)
 		
 	relayA->Set(motorADirection);
 	isOn = false;
-	printf("Sweeper off!\n");
+	//printf("Sweeper off!\n");
 }
 
 void Sweeper::DirectControl(Relay::Value newADirection)

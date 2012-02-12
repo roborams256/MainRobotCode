@@ -21,6 +21,7 @@ private:
 	Relay *triggerRelay;
 	double launchPeriod;
 	bool semi;
+	bool pulse;
 	Timer *timer;
 	
 public:
@@ -29,6 +30,9 @@ public:
 	void hold(void);
 	void fireAuto(void);
 	void fireSemiAuto(void);
+	void firePulse(void);
+	void stopPulse(void);
+	bool pulsing(void);
 	void setLaunchPeriod(double launchTime);
 	void Update(void);
 	

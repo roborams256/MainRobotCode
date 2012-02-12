@@ -95,3 +95,5 @@ GetThrottle() reads analog triggers (positive right, neg left)
 #define GPAD_LEFT_Y_RAW_AXIS 	2
 #define GPAD_RIGHT_Y_RAW_AXIS 	5
 
+#define BELT_SPEED 0.75
+

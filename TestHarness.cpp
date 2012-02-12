@@ -11,12 +11,14 @@
 
 	TestHarness::TestHarness(Joystick *js){
 		
-		victorOne = new Victor(10);
-		victorOneValue = 0;
+		//victorOne = new Victor(10);
+		//victorOneValue = 0;
 		
-		joystick = js;
-		toggleButton = new ToggleButton(joystick, 1, 4);
-		wheel = new TriggerWheel(1, 1);
+		//joystick = js;
+		//toggleButton = new ToggleButton(joystick, 1, 4);
+		//wheel = new TriggerWheel(1, 1);
+		
+		digInput = new DigitalInput(1);
 			
 	}
 	
@@ -24,15 +26,16 @@
 		
 		//victorOne->Set(victorOneValue);
 		//printf("Updating Vone with [%f]\n", victorOneValue);
-		toggleButton->Update();
-		int st = toggleButton->State();
+		//toggleButton->Update();
+		//int st = toggleButton->State();
 		//printf("Button is at state [%d]\n", st);
-		victorOne->Set(st == 1 ? -1 : ((st == 2 || st == 4) ? victorOneValue : 1));
-		if (joystick->GetRawButton(2))
-			wheel->fireSemiAuto();
+		///victorOne->Set(st == 1 ? -1 : ((st == 2 || st == 4) ? victorOneValue : 1));
+		//if (joystick->GetRawButton(2))
+		//	wheel->fireSemiAuto();
 		
-		wheel->Update();
+		//wheel->Update();
 		
+		printf("Dig in 1 is %d/n", digInput->Get());
 	}
 	
 	
