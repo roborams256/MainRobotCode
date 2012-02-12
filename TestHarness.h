@@ -1,3 +1,6 @@
+#include "ToggleButton.h"
+#include "TriggerWheel.h"
+
 class TestHarness
 {
 public:

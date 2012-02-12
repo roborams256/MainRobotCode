@@ -3,10 +3,11 @@
 // Constants.h has the mappings for PWM, Digital IO Channels, etc.
 #include "Constants.h"
 #include "Sweeper.h"
-#include "ToggleButton.hpp"
+#include "ToggleButton.h"
+#include "TriggerWheel.h"
 #include "TestHarness.h"
 
-#define TEST_MODE
+//#define TEST_MODE
 
 #include <stdio.h>
 
@@ -66,8 +67,9 @@ public:
 		Relay *belt = new Relay(3);
 		belt->Set(Relay::kReverse);
 		
-		Relay *trigger = new Relay(SPIKE_TRIGGER);
-		trigger->Set(Relay::kForward);
+		//Relay *trigger = new Relay(SPIKE_TRIGGER);
+		//trigger->Set(Relay::kForward);
+		TriggerWheel *trigger = new TriggerWheel(1, 1);
 		
 		Jaguar *bjr = new Jaguar(10);
 		Jaguar *bjl = new Jaguar(9);
@@ -87,6 +89,11 @@ public:
 			// Use left and right joysticks on Gamepad One
 		    leroyDrive->TankDrive(joystickOne->GetRawAxis(GPAD_LEFT_Y_RAW_AXIS) * JOYSTICK_DRIVE_SCALE_FACTOR, 
 		    		joystickOne->GetRawAxis(GPAD_RIGHT_Y_RAW_AXIS) * JOYSTICK_DRIVE_SCALE_FACTOR); 
+		    
+		    if (joystickOne->GetRawButton(2))
+		    	trigger->fireSemiAuto();
+		    
+		    trigger->Update();
 		    
 #endif
 #ifdef TEST_MODE

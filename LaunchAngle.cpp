@@ -6,7 +6,7 @@
  */
 
 #include "WPILib.h"
-#include "LaunchAngle.hpp"
+#include "LaunchAngle.h"
 #define MAX_LEFT 0.5
 #define MAX_RIGHT 0.95
 

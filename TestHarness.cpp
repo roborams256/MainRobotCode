@@ -1,6 +1,4 @@
 #include "WPILib.h"
-#include "ToggleButton.hpp"
-#include "TriggerWheel.h"
 #include "TestHarness.h"
 /*
  * TestHarness.cpp
@@ -28,7 +26,7 @@
 		//printf("Updating Vone with [%f]\n", victorOneValue);
 		toggleButton->Update();
 		int st = toggleButton->State();
-		printf("Button is at state [%d]\n", st);
+		//printf("Button is at state [%d]\n", st);
 		victorOne->Set(st == 1 ? -1 : ((st == 2 || st == 4) ? victorOneValue : 1));
 		if (joystick->GetRawButton(2))
 			wheel->fireSemiAuto();

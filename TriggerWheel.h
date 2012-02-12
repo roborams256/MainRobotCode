@@ -1,3 +1,5 @@
+#pragma once
+
 #include "WPILib.h"
 #include "Constants.h"
 

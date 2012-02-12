@@ -46,6 +46,7 @@ void TriggerWheel::fireSemiAuto()
 	
 	fireAuto();
 	semi = true;
+	printf("BANG\n");
 }
 
 void TriggerWheel::Update()
