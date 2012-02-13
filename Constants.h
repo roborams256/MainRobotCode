@@ -20,6 +20,19 @@
  * 
  */
 
+// If VERBOSE_DEBUG is defined, then DEBUG_PRINT is replaced with a printf.
+// Otherwise it turns into nothing (for normal run).
+
+#define VERBOSE_DEBUG
+
+#ifdef VERBOSE_DEBUG
+#define DEBUG_PRINT(args...) printf(args)
+#else
+#define DEBUG_PRINT
+#endif
+
+
+
 // PWM Channels
 
 
@@ -35,6 +48,7 @@
 
 // Spike Shannels
 
+#define 	SPIKE_BELT			1
 #define		SPIKE_SWEEPER		2
 #define		SPIKE_TRIGGER		7
 
@@ -70,7 +84,7 @@
  * 
  */
 
-#define 	DIN_LAUNCH_LIMIT	2
+#define 	DIG_IN_BALL_SENSOR	2
 
 /*
  * Gamepad channels

@@ -1,70 +1,74 @@
 #include "Sweeper.h"
 
-Sweeper::Sweeper(int channelA)
+Sweeper::Sweeper(int channel)
 {
-	//Set up the spike relays
-	relayA = new Relay(channelA, Relay::kBothDirections);
+	//Set up the spike relay
+	relay = new Relay(channel, Relay::kBothDirections);
 	
-	motorADirection = Relay::kOff;
+	motorDirection = Relay::kOff;
 	
-	relayA->Set(motorADirection);
+	relay->Set(motorDirection);
 	
 	isOn = false;
 	
-	printf("Sweeper initted on channels %d\n", channelA);
+#ifdef VERBOSE_DEBUG
+	printf("Sweeper initted on channels %d\n", channel);
+#endif
 
 }
 
 void Sweeper::On(void)
 {
-	motorADirection = Relay::kForward;
+	motorDirection = Relay::kForward;
 	
-	relayA->Set(motorADirection);
+	relay->Set(motorDirection);
 	isOn = true;
-	//printf("Sweeper on!\n");
+
+	DEBUG_PRINT("Sweeper on!\n");
+	
 }
 
 void Sweeper::Reverse(void)
 {
-	motorADirection = Relay::kReverse;
+	motorDirection = Relay::kReverse;
 	isOn = true;
-	relayA->Set(motorADirection);
+	relay->Set(motorDirection);
 }
 
 void Sweeper::Off(void)
 {
-	motorADirection = Relay::kOff;
+	motorDirection = Relay::kOff;
 		
-	relayA->Set(motorADirection);
+	relay->Set(motorDirection);
 	isOn = false;
 	//printf("Sweeper off!\n");
 }
 
 void Sweeper::DirectControl(Relay::Value newADirection)
 {
-	motorADirection = newADirection;
+	motorDirection = newADirection;
 			
-	relayA->Set(motorADirection);
+	relay->Set(motorDirection);
 	
 	isOn = true; // TODO should check if motors are not = 0
 }
 
 Relay::Value Sweeper::GetMotor(void)
 {
-	return motorADirection;
+	return motorDirection;
 }
 
 void Sweeper::InvertDirection(){
 	
 	printf("Invert called in sweeper.");
-	if (motorADirection == Relay::kReverse){
+	if (motorDirection == Relay::kReverse){
 		
 		printf("Switching from reverse to forward.\n");
 		On();
 	
 	//if the moter is in reverse it starts to move normally
 	}
-	else if (motorADirection == Relay::kOn){
+	else if (motorDirection == Relay::kOn){
 		printf("Switching from forward to reverse.\n");
 		Reverse();
 //if the motor is in on it starts to move in reverse	
