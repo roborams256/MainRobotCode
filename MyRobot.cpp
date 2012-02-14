@@ -7,8 +7,9 @@
 #include "ToggleButton.h"
 #include "TriggerWheel.h"
 #include "TestHarness.h"
+#include "AutonomousConstants.h"
 
-//#define TEST_MODE
+#define TEST_MODE
 
 #ifdef TEST_MODE
 
@@ -32,6 +33,15 @@ class RobotDemo : public SimpleRobot
 	Joystick *joystickOne;
 	Joystick *joystickTwo;
 	Sweeper *sweeper;
+	Encoder *leftEncoder;
+	Encoder *rightEncoder;
+	
+	DigitalInput *pin1;
+	DigitalInput *pin2;
+	
+	
+	
+	
 
 public:
 	RobotDemo(void){
@@ -42,7 +52,25 @@ public:
 		
 		joystickOne = new Joystick(1);
 		joystickTwo = new Joystick(2);
+		
+		rightEncoder = new Encoder(1,2,false,CounterBase::k4X);
+		leftEncoder = new Encoder(11,12,false,CounterBase::k4X);
+		
+	
+		
+		
+		//pin1 = new DigitalInput(1);
+		//pin2 = new DigitalInput(2);
+		
 
+	}
+	
+	void TankDriveMe(){
+		float rdrive = joystickOne->GetRawAxis(LEFT_Y_AXIS) * JOYSTICK_DRIVE_SCALE_FACTOR;
+		float ldrive = joystickOne->GetRawAxis(RIGHT_Y_AXIS) * JOYSTICK_DRIVE_SCALE_FACTOR;
+		DEBUG_PRINT("Left drive:[%f] | Right drive:[%f]\n", ldrive, rdrive);
+		
+	    leroyDrive->TankDrive(ldrive, ldrive);
 	}
 
 	/**
@@ -51,10 +79,43 @@ public:
 	void Autonomous(void)
 	{
 
+		Jaguar *bjl;
+		Jaguar *bjr;
+		
+		rightEncoder->SetDistancePerPulse(4.0/360.0);
+		rightEncoder->Reset();
+		rightEncoder->Start();
+		
 		leroyDrive->SetSafetyEnabled(false);
-		leroyDrive->Drive(0.35, 0.0); 	// drive forwards half speed
-		Wait(2.0); 				//    for 2 seconds
+		leroyDrive->Drive(0.3, AUTON_TIMED_CURVE_OFFSET); 	// drive forwards half speed
+		
+		while (rightEncoder->GetDistance() > -55.2){
+			DEBUG_PRINT("Roto %lf\n", rightEncoder->GetDistance());
+		}
+		
+		//    for 2 seconds
 		leroyDrive->Drive(0.0, 0.0); 	// stop robot
+		
+		sweeper->On();
+		
+		Jaguar *belt = new Jaguar(7);
+				
+				//Jaguar *angle = new Jaguar(8);
+				
+				//angle->Set(0.0);
+						
+		float beltSpeed = -01.0;
+		float ballSpeed = -0.30;
+				
+		belt->Set(beltSpeed);
+				
+		bjl->Set(ballSpeed);
+		bjr->Set(ballSpeed);
+		
+		
+		TriggerWheel *trigger = new TriggerWheel(1, 0.1);
+		trigger->fireAuto();
+		
 
 	}
 
@@ -70,6 +131,15 @@ public:
 		printf("Test mode!\n");
 		//TestHarness *testHarness = new TestHarness(joystickOne);
 		ToggleButton *tbutt = new ToggleButton(joystickOne, A_BUTTON, 12);
+		
+		rightEncoder->SetDistancePerPulse(4.0/360.0);
+		rightEncoder->Reset();
+		rightEncoder->Start();
+		
+		leftEncoder->SetDistancePerPulse(4.0/360.0);
+		leftEncoder->Reset();
+		leftEncoder->Start();
+
 		
 		
 #endif
@@ -160,10 +230,12 @@ public:
 #endif
 #ifdef TEST_MODE
 		    
+		    
+		    TankDriveMe();
+		    DEBUG_PRINT("L Encoder: %lf  R Encoder:  %lf\n", leftEncoder->GetDistance(),  rightEncoder->GetDistance());
 		    //testButtons(joystickOne);
 		    
-		    int axis = tbutt->State()+1;
-		    DEBUG_PRINT("Axis %d is at %f\n", axis, joystickOne->GetThrottle());
+		    
 		    
 		    //testHarness->Update();
 #endif

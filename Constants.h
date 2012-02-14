@@ -109,7 +109,7 @@ GetThrottle() reads analog triggers (positive right, neg left)
 
 // Scaling factor controls what percent of the joystick motion gets applied
 // to the tank drive. 1.0 = 100%, 0.5 = 50% etc.
-#define JOYSTICK_DRIVE_SCALE_FACTOR 1.0
+#define JOYSTICK_DRIVE_SCALE_FACTOR 0.4
 
 #define GPAD_LEFT_Y_RAW_AXIS 	2
 #define GPAD_RIGHT_Y_RAW_AXIS 	3
