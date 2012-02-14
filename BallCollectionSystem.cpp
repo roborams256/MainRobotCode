@@ -11,10 +11,30 @@ BallCollectionSystem::BallCollectionSystem(void){
 	sweeper = new Sweeper(SPIKE_SWEEPER);
 	sweeper->Off();
 	
-	ballsInChute = 0;
 	
-	ballSensor = new DigitalInput(DIG_IN_BALL_SENSOR);
+	triggerWheel = new TriggerWheel(SPIKE_TRIGGER, TRIGGER_WHEEL_PERIOD_S);
 	
-	ballTimer = new Timer();
 	
+	//TODO Logic for counter
+	
+	//ballsInChute = 0;
+	
+	//ballSensor = new DigitalInput(DIG_IN_BALL_SENSOR);
+	
+	//ballTimer = new Timer();
+	
+}
+
+void BallCollectionSystem::On(void){
+	
+	triggerWheel->Hold();
+	sweeper->On();
+	ballBelt->On();
+}
+
+void BallCollectionSystem::Off(void){
+	
+	triggerWheel->Hold();
+	sweeper->Off();
+	ballBelt->Off();
 }

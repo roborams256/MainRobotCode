@@ -51,21 +51,19 @@
 #define		PWM_LAUNCH_ANGLE	7
 
 
-// Spike Shannels
+// Ball Collection System constants
 
-#define 	SPIKE_BELT			1
-#define		SPIKE_SWEEPER		2
-#define		SPIKE_TRIGGER		7
+#define 	SPIKE_BELT				1
+#define		SPIKE_SWEEPER			2
+
+#define		SPIKE_TRIGGER			7
+#define 	TRIGGER_WHEEL_PERIOD_S	1.0  // 1 second wheel spin
 
 
 
 // Digital Outputs
 
-// Laser might be on a spike or a digital IO
 
-#define		SPIKE_LASER			3		
-
-#define		DOUT_LASER			1
 
 /*
  * 
@@ -89,6 +87,11 @@
  * 
  */
 
+// The roto encoder is on pins 1 and 2
+#define DIO_ENCODER_A 1
+#define DIO_ENCODER_B 2
+
+
 #define 	DIG_IN_BALL_SENSOR	2
 
 /*
@@ -111,9 +114,19 @@ GetThrottle() reads analog triggers (positive right, neg left)
 // to the tank drive. 1.0 = 100%, 0.5 = 50% etc.
 #define JOYSTICK_DRIVE_SCALE_FACTOR 0.4
 
-#define GPAD_LEFT_Y_RAW_AXIS 	2
-#define GPAD_RIGHT_Y_RAW_AXIS 	3
-#define GPAD_DEPAD_X_RAW_AXIS 	5
 
-#define BELT_SPEED 0.75
+// Roto encoder
+
+#define WHEEL_DIAMETER 4.0
+#define PI 3.1415926
+#define DRIVE_GEAR_TEETH 15
+#define WHEEL_GEAR_TEETH 24
+// use this to adjust the math
+#define EMPIRICAL_ADJUST 1.0
+
+
+// Don't mess with the formula!
+#define INCHES_PER_TICK  EMPIRICAL_ADJUST * WHEEL_DIAMETER * PI * DRIVE_GEAR_TEETH / WHEEL_GEAR_TEETH / 360
+
+
 

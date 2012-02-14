@@ -6,7 +6,7 @@ TriggerWheel::TriggerWheel(int spikeChannel, double launchTime){
 	triggerRelay = new Relay(SPIKE_TRIGGER);  // default should be both directions
 	
 	// start in the hold direction
-	hold();
+	Hold();
 	
 	launchPeriod = launchTime; 
 	semi = false;
@@ -17,13 +17,13 @@ TriggerWheel::TriggerWheel(int spikeChannel, double launchTime){
 	
 }
 
-void TriggerWheel::hold(void){
+void TriggerWheel::Hold(void){
 		
 	triggerRelay->Set(Relay::kReverse);
 		
 }
 
-void TriggerWheel::fireAuto(void){
+void TriggerWheel::FireAuto(void){
 		
 
 	triggerRelay->Set(Relay::kForward);
@@ -32,39 +32,40 @@ void TriggerWheel::fireAuto(void){
 }
 
 
-void TriggerWheel::setLaunchPeriod(double launchTime)
+void TriggerWheel::SetLaunchPeriod(double launchTime)
 {
 	
 	launchPeriod = launchTime;
 	
 }
 
-void TriggerWheel::fireSemiAuto()
+void TriggerWheel::FireSemiAuto()
 {
 	if (semi) return; //don't allow re-firing
+	
 	timer->Reset();
 	timer->Start();
 	
-	fireAuto();
+	FireAuto();
 	semi = true;
-	printf("BANG\n");
+	DEBUG_PRINT("BANG\n");
 }
 
-void TriggerWheel::firePulse(void)
+void TriggerWheel::FirePulse(void)
 {
 	pulse = true;
 	timer->Reset();
 	timer->Start();
 }
 
-void TriggerWheel::stopPulse(void)
+void TriggerWheel::StopPulse(void)
 {
 	pulse = false;
 	timer->Stop();
 	timer->Reset();
 }
 
-bool TriggerWheel::pulsing(void)
+bool TriggerWheel::Pulsing(void)
 {
 	return pulse;
 }
@@ -73,11 +74,15 @@ void TriggerWheel::Update()
 {
 	if (semi && timer->HasPeriodPassed(launchPeriod))
 	{
-		hold();
+		Hold();
 		timer->Stop();
 		timer->Reset();
 		semi = false;
 	}
+	
+	return;
+	
+	// TODO: Robert, what is pulse?
 	
 	if (pulse)
 	{
@@ -87,5 +92,5 @@ void TriggerWheel::Update()
 	}
 	
 	if (!pulse && !semi)
-		stopPulse();
+		StopPulse();
 }

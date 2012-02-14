@@ -27,13 +27,13 @@ private:
 public:
 	
 	TriggerWheel(int spikeChannel, double launnchTime);
-	void hold(void);
-	void fireAuto(void);
-	void fireSemiAuto(void);
-	void firePulse(void);
-	void stopPulse(void);
-	bool pulsing(void);
-	void setLaunchPeriod(double launchTime);
+	void Hold(void);
+	void FireAuto(void);
+	void FireSemiAuto(void);
+	void FirePulse(void);
+	void StopPulse(void);
+	bool Pulsing(void);
+	void SetLaunchPeriod(double launchTime);
 	void Update(void);
 	
 };

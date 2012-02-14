@@ -1,6 +1,9 @@
 #include "ToggleButton.h"
 #include "TriggerWheel.h"
 
+extern void testButtons(Joystick *joystick);
+extern void testAxis(Joystick *joystick);
+
 class TestHarness
 {
 public:

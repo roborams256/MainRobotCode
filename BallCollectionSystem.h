@@ -1,6 +1,7 @@
 #import "WPILib.h"
 #import "Sweeper.h"
 #import "BallBelt.h"
+#import "TriggerWheel.h"
 
 /*
  * 
@@ -19,6 +20,7 @@ public:
 	int ballsInChute;
 	BallBelt *ballBelt;
 	Sweeper *sweeper;
+	TriggerWheel *triggerWheel;
 	
 	BallCollectionSystem(void);
 	
@@ -29,6 +31,9 @@ public:
 	void AutoPause(bool shouldPause);
 	void Update();
 	
+	void Fire();
+	
+	// TODO implement ball counter
 	DigitalInput *ballSensor;
 	Timer *ballTimer;
 	
