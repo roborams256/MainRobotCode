@@ -10,6 +10,13 @@
 
 //#define TEST_MODE
 
+#ifdef TEST_MODE
+
+extern void testButtons(Joystick *joystick);
+extern void testAxis(Joystick *joystick);
+
+#endif
+
 #include <stdio.h>
 
 /**
@@ -45,7 +52,7 @@ public:
 	{
 
 		leroyDrive->SetSafetyEnabled(false);
-		leroyDrive->Drive(0.5, 0.0); 	// drive forwards half speed
+		leroyDrive->Drive(0.35, 0.0); 	// drive forwards half speed
 		Wait(2.0); 				//    for 2 seconds
 		leroyDrive->Drive(0.0, 0.0); 	// stop robot
 
@@ -61,7 +68,10 @@ public:
 		
 #ifdef TEST_MODE
 		printf("Test mode!\n");
-		TestHarness *testHarness = new TestHarness(joystickOne);
+		//TestHarness *testHarness = new TestHarness(joystickOne);
+		ToggleButton *tbutt = new ToggleButton(joystickOne, A_BUTTON, 12);
+		
+		
 #endif
 		
 #ifndef TEST_MODE
@@ -73,25 +83,25 @@ public:
 		
 		//Relay *trigger = new Relay(SPIKE_TRIGGER);
 		//trigger->Set(Relay::kForward);
-		TriggerWheel *trigger = new TriggerWheel(1, 0.1);
-		ToggleButton *beltbutton = new ToggleButton(joystickOne, 3, 2);
+		//TriggerWheel *trigger = new TriggerWheel(1, 0.1);
+		//ToggleButton *beltbutton = new ToggleButton(joystickOne, 3, 2);
 		
-		Jaguar *bjr = new Jaguar(10);
-		Jaguar *bjl = new Jaguar(9);
-		Jaguar *belt = new Jaguar(7);
+		//Jaguar *bjr = new Jaguar(10);
+		//Jaguar *bjl = new Jaguar(9);
+		//Jaguar *belt = new Jaguar(7);
 		
-		Jaguar *angle = new Jaguar(8);
+		//Jaguar *angle = new Jaguar(8);
 		
-		angle->Set(0.0);
+		//angle->Set(0.0);
 				
-		float beltSpeed = -0.75;
-		float ballSpeed = -0.5;
+		//float beltSpeed = -0.75;
+		//float ballSpeed = -0.5;
 		
-		belt->Set(beltSpeed);
+		//belt->Set(beltSpeed);
 		
-		bjl->Set(ballSpeed);
-		bjr->Set(ballSpeed);
-		
+		//bjl->Set(ballSpeed);
+		//bjr->Set(ballSpeed);
+
 		
 		
 #endif
@@ -103,16 +113,20 @@ public:
 		{
 			
 #ifndef TEST_MODE
-			sweeper->On();
+			//sweeper->On();
 			// Use left and right joysticks on Gamepad One
-		    leroyDrive->TankDrive(joystickOne->GetRawAxis(GPAD_LEFT_Y_RAW_AXIS) * JOYSTICK_DRIVE_SCALE_FACTOR, 
-		    		joystickOne->GetRawAxis(GPAD_RIGHT_Y_RAW_AXIS) * JOYSTICK_DRIVE_SCALE_FACTOR); 
+			float rdrive = joystickOne->GetRawAxis(LEFT_Y_AXIS) * JOYSTICK_DRIVE_SCALE_FACTOR;
+			float ldrive = joystickOne->GetRawAxis(RIGHT_Y_AXIS) * JOYSTICK_DRIVE_SCALE_FACTOR;
+			DEBUG_PRINT("Left drive:[%f] | Right drive:[%f]\n", ldrive, rdrive);
+			
+		    leroyDrive->TankDrive(ldrive, rdrive);
+		    
 		    
 		    /*if (joystickOne->GetRawButton(2) && !trigger->pulsing())
 		    	trigger->firePulse();
 		    else if (!joystickOne->GetRawButton(2) && trigger->pulsing())
 		    	trigger->stopPulse();*/
-		    
+		    /*
 		    if (joystickOne->GetRawButton(2))
 		    	trigger->fireSemiAuto();
 		    
@@ -142,12 +156,16 @@ public:
 		    else
 		    	angle->Set(0.0);
 		    
-		    
+		    */
 #endif
 #ifdef TEST_MODE
 		    
+		    //testButtons(joystickOne);
 		    
-		    testHarness->Update();
+		    int axis = tbutt->State()+1;
+		    DEBUG_PRINT("Axis %d is at %f\n", axis, joystickOne->GetThrottle());
+		    
+		    //testHarness->Update();
 #endif
 
 			Wait(0.005);				// wait for a motor update time

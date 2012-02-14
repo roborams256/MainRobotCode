@@ -20,8 +20,13 @@
  * 
  */
 
+// Get the raw axis and button numbers
+#import "GPadConstants.h"
+
 // If VERBOSE_DEBUG is defined, then DEBUG_PRINT is replaced with a printf.
 // Otherwise it turns into nothing (for normal run).
+
+
 
 #define VERBOSE_DEBUG
 
@@ -107,7 +112,8 @@ GetThrottle() reads analog triggers (positive right, neg left)
 #define JOYSTICK_DRIVE_SCALE_FACTOR 1.0
 
 #define GPAD_LEFT_Y_RAW_AXIS 	2
-#define GPAD_RIGHT_Y_RAW_AXIS 	5
+#define GPAD_RIGHT_Y_RAW_AXIS 	3
+#define GPAD_DEPAD_X_RAW_AXIS 	5
 
 #define BELT_SPEED 0.75
 

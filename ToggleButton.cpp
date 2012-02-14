@@ -23,7 +23,7 @@ ToggleButton::ToggleButton(Joystick *gamePad, int button, int numstates)
 	m_button = button;
 	m_gamePad = gamePad;
 	m_numstates = numstates;
-	m_state = 1;
+	m_state = 0;  // changed by Mitch to reflect standard of counting from 0
 }
 
 /*
@@ -48,7 +48,7 @@ void ToggleButton::Update()
 		//printf("Button state changed to: [%d]\n", m_state);
 		if (m_state > m_numstates)
 		{
-			m_state = 1;
+			m_state = 0;
 		}
 	}
 	
@@ -58,5 +58,6 @@ void ToggleButton::Update()
 
 int ToggleButton::State()
 {
+	Update();  //added by mitch so you don't have to update every cycle
 	return m_state;
 }
