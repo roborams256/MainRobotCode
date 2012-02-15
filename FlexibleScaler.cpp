@@ -22,12 +22,13 @@ float FlexibleScaler::Scale(float input){
 	switch (scaleMode) {
 	
 	case kScaleUnity:  // unity function
-		return input;
+		rval = input;
 		break;
 		
 	case kScaleLinear:
 		
-		return input*linearScaleValue;
+		rval = input*linearScaleValue;
+		break;
 		
 		
 	case kScalePower2:

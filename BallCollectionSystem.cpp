@@ -38,3 +38,37 @@ void BallCollectionSystem::Off(void){
 	sweeper->Off();
 	ballBelt->Off();
 }
+
+
+void BallCollectionSystem::Fire(void){
+	
+	triggerWheel->FireSemiAuto();
+	
+}
+
+void BallCollectionSystem::FireAuto(void){
+	
+	triggerWheel->FireAuto();
+	
+}
+
+void BallCollectionSystem::Hold(void){
+	
+	triggerWheel->Hold();
+	
+}
+
+void BallCollectionSystem::Reverse(void){
+	
+	triggerWheel->Hold();
+	sweeper->Reverse();
+	ballBelt->Reverse();
+}
+
+void BallCollectionSystem::Update(void){
+	
+	
+	triggerWheel->Update();
+	
+}
+

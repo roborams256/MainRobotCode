@@ -29,9 +29,11 @@ public:
 	void Reverse(void);
 	
 	void AutoPause(bool shouldPause);
-	void Update();
+	void Update(void);
 	
-	void Fire();
+	void Fire(void);
+	void FireAuto(void);
+	void Hold(void);
 	
 	// TODO implement ball counter
 	DigitalInput *ballSensor;

@@ -25,9 +25,7 @@ void TriggerWheel::Hold(void){
 
 void TriggerWheel::FireAuto(void){
 		
-
 	triggerRelay->Set(Relay::kForward);
-
 		
 }
 
@@ -43,6 +41,7 @@ void TriggerWheel::FireSemiAuto()
 {
 	if (semi) return; //don't allow re-firing
 	
+	timer->Stop();
 	timer->Reset();
 	timer->Start();
 	

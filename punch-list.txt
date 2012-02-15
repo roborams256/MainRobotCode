@@ -9,10 +9,13 @@ X wire all PWMs for driving
 - Mount camera
 - Mount wifi bridge
 - Add mode select buttons on DIO (DIP switches, jumpers?)
+- Tower ball sensor
 
 
 
 Software List
-- Change belt object to use spike
+- Debug semi-auto firing
+
+
 
 

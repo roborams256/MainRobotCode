@@ -53,11 +53,17 @@
 
 // Ball Collection System constants
 
-#define 	SPIKE_BELT				1
+#define 	SPIKE_BELT				3
 #define		SPIKE_SWEEPER			2
 
 #define		SPIKE_TRIGGER			7
 #define 	TRIGGER_WHEEL_PERIOD_S	1.0  // 1 second wheel spin
+
+
+// Shooter
+#define ANALOG_INPUT_SHOOTER_ANGLE  4
+#define DIG_IN_ZERO_SENSOR 	5	
+#define ANGLE_JAG_SCALER 0.15
 
 
 
@@ -92,7 +98,7 @@
 #define DIO_ENCODER_B 2
 
 
-#define 	DIG_IN_BALL_SENSOR	2
+#define 	DIG_IN_BALL_SENSOR	4
 
 /*
  * Gamepad channels

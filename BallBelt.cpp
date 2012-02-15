@@ -17,22 +17,22 @@ BallBelt::BallBelt(int channel)
 
 void BallBelt::On(void)
 {
-	motorDirection = Relay::kForward;
+	motorDirection = Relay::kReverse;
 	
 	relay->Set(motorDirection);
 	isOn = true;
 
-	DEBUG_PRINT("Belt on!\n");
+	//DEBUG_PRINT("Belt on!\n");
 	
 }
 
 void BallBelt::Reverse(void)
 {
-	motorDirection = Relay::kReverse;
+	motorDirection = Relay::kForward;
 	isOn = true;
 	relay->Set(motorDirection);
 	
-	DEBUG_PRINT("Belt reversed!\n");
+	//DEBUG_PRINT("Belt reversed!\n");
 }
 
 void BallBelt::Off(void)
@@ -42,7 +42,7 @@ void BallBelt::Off(void)
 	relay->Set(motorDirection);
 	isOn = false;
 	
-	DEBUG_PRINT("Belt off!\n");
+	//DEBUG_PRINT("Belt off!\n");
 }
 
 void BallBelt::InvertDirection(){
