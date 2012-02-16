@@ -27,6 +27,8 @@ class RobotDemo : public SimpleRobot
 	
 	BallCollectionSystem *ballCollector;
 	BallCannon *ballCannon;
+	Sweeper *ballSweeper;
+	
 	
 	enum TestModes {
 		kBallCollector,
@@ -70,6 +72,7 @@ public:
 		
 		ballCollector = new BallCollectionSystem();
 		ballCannon = new BallCannon();
+		ballSweeper = new Sweeper(SPIKE_SWEEPER);
 		
 		
 #ifdef TEST_MODE
@@ -88,12 +91,12 @@ void TankDriveMe(){
 		//float rdrive = tankDriveScaler->Scale(joystickOne->GetRawAxis(LEFT_Y_AXIS));
 		//float ldrive = tankDriveScaler->Scale(joystickOne->GetRawAxis(RIGHT_Y_AXIS));
 		
-		float rdrive = 0.75*joystickOne->GetRawAxis(LEFT_Y_AXIS);
-		float ldrive = 0.75*joystickOne->GetRawAxis(RIGHT_Y_AXIS);
+		float rdrive = 0.95*joystickOne->GetRawAxis(LEFT_Y_AXIS);
+		float ldrive = 0.95*joystickOne->GetRawAxis(RIGHT_Y_AXIS);
 				
 		DEBUG_PRINT("Left drive:[%f] | Right drive:[%f]\n", ldrive, rdrive);		
 	    
-		leroyDrive->TankDrive(ldrive, rdrive);
+		leroyDrive->TankDrive(-ldrive, -rdrive); /* changing direction sense */
 	    
 };
 	
@@ -143,6 +146,8 @@ void OperatorModeSetup(void){
 void OperatorModeControlLoop(void){
 		
 	TankDriveMe();
+	ballCollector->On(); /*  rg */
+	ballSweeper->On();   /* rg */
 	
 	ballCannon->DirectDriveAngle(joystickTwo->GetRawAxis(LEFT_Y_AXIS));
 	
@@ -155,7 +160,7 @@ void OperatorModeControlLoop(void){
 		ballCollector->FireAuto();
 	} 
 	else if ( joystickTwo->GetRawButton(Y_BUTTON) ){
-		ballCannon->SetPower(0.65);
+		ballCannon->SetPower(1.0);
 		ballCollector->FireAuto();
 	} 
 	else {

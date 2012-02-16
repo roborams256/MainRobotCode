@@ -42,7 +42,7 @@ void BallCollectionSystem::Off(void){
 
 void BallCollectionSystem::Fire(void){
 	
-	triggerWheel->FireSemiAuto();
+	triggerWheel->FireAuto();
 	
 }
 

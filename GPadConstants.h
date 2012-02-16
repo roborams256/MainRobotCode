@@ -3,6 +3,7 @@
  * Constants for the Logitech Gamepad
  * 
  * Don't edit this unless you really understand what you are DOING!!!
+ * Edits: rg 2/15/12 - I think the RIGHT_Y_AXIS and RIGHT_X_AXIS were not 3 and 4 -> 4 and 5
  * 
  * 
  */
@@ -23,8 +24,8 @@
 #define LEFT_X_AXIS 1
 #define LEFT_Y_AXIS 2
 
-#define RIGHT_X_AXIS 3
-#define RIGHT_Y_AXIS 4
+#define RIGHT_X_AXIS 4
+#define RIGHT_Y_AXIS 5
 
 #define DPAD_X_AXIS 5
 #define DPAD_Y_AXIS 6

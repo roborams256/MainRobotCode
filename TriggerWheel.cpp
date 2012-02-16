@@ -26,6 +26,7 @@ void TriggerWheel::Hold(void){
 void TriggerWheel::FireAuto(void){
 		
 	triggerRelay->Set(Relay::kForward);
+	DEBUG_PRINT("FIRE!/n");
 		
 }
 
@@ -39,6 +40,11 @@ void TriggerWheel::SetLaunchPeriod(double launchTime)
 
 void TriggerWheel::FireSemiAuto()
 {
+	
+	
+	triggerRelay->Set(Relay::kForward);
+	return;
+	
 	if (semi) return; //don't allow re-firing
 	
 	timer->Stop();

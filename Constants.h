@@ -56,8 +56,14 @@
 #define 	SPIKE_BELT				3
 #define		SPIKE_SWEEPER			2
 
-#define		SPIKE_TRIGGER			7
+#define		SPIKE_TRIGGER			8
 #define 	TRIGGER_WHEEL_PERIOD_S	1.0  // 1 second wheel spin
+
+
+// Bridge Actuator
+#define SPIKE_BRIDGE_ACTUATOR 	5
+#define DIG_IN_TOP_SENSOR 		3
+#define DIG_IN_BOTTOM_SENSOR 	4
 
 
 // Shooter
