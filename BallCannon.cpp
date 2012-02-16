@@ -61,8 +61,9 @@ void BallCannon::Calibrate(void){
 
 void BallCannon::DirectDriveAngle(float jagVal){
 	
-	if ( !zeroSensor->Get() && ( jagVal > 0 ) )
-		return;
+	DEBUG_PRINT("Cannon driven with: %1.3f sensor reads %d\n", jagVal, zeroSensor->Get());
+	//if ( !zeroSensor->Get() && ( jagVal > 0 ) )
+	//	return;
 	
 	angleJag->Set( ANGLE_JAG_SCALER * jagVal );
 	

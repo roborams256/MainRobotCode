@@ -68,7 +68,9 @@ void BallCollectionSystem::Reverse(void){
 void BallCollectionSystem::Update(void){
 	
 	
-	triggerWheel->Update();
+	//triggerWheel->Update();
 	
 }
+
+
 

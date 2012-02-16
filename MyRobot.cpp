@@ -9,8 +9,11 @@
 #include "BallCannon.h"
 #include <stdio.h>
 
-//#define TEST_MODE
+#define TEST_MODE
 
+void testButtons(Joystick *joystick);
+
+void testAxis(Joystick *joystick);
 
 
 
@@ -31,8 +34,9 @@ class RobotDemo : public SimpleRobot
 	
 	
 	enum TestModes {
+		kRawIO,
 		kBallCollector,
-		kBallShooter,
+		kBallCannon,
 		kDriveTrain,
 		kAllSensors,
 		kUltrasonic,
@@ -44,6 +48,14 @@ class RobotDemo : public SimpleRobot
 #ifdef TEST_MODE
 	TestModes testMode;
 	ToggleButton *testModeToggleButton;
+	ToggleButton *testSubModeToggleButton;
+	Jaguar *testJag;
+	Relay *testRelay;
+	bool startTest;
+	int subTestMode, lastSubTestMode;
+	
+
+	
 #endif
 	
 	
@@ -70,14 +82,22 @@ public:
 		
 		// Initialize the ball collection system
 		
+#ifndef TEST_MODE
 		ballCollector = new BallCollectionSystem();
 		ballCannon = new BallCannon();
-		ballSweeper = new Sweeper(SPIKE_SWEEPER);
+#endif
+		
 		
 		
 #ifdef TEST_MODE
 		
 		testModeToggleButton = new ToggleButton(joystickOne, LB_BUTTON, (int)kTestEnd);
+		testSubModeToggleButton = new ToggleButton(joystickOne, RB_BUTTON, 6);
+		testJag = NULL;
+		testRelay = NULL;
+		lastSubTestMode = 0;
+		ballCollector = NULL;
+		ballCannon = NULL;
 	
 #endif
 		
@@ -139,6 +159,9 @@ void Autonomous(void){
 void OperatorModeSetup(void){
 		
 		DEBUG_PRINT("Normal operator mode. In setup.\n");
+		
+		
+		
 }
 
 
@@ -197,7 +220,11 @@ void OperatorControl(void){
 		{
 			
 #ifdef TEST_MODE
-			
+		
+		//testButtons(joystickOne);
+		//int joy = testSubModeToggleButton->State() + 1;
+		//	printf("Stick %d is at %f\n", joy, joystickOne->GetRawAxis(joy));
+		
 		TestModeControlLoop();
 #endif
 
@@ -225,24 +252,68 @@ void OperatorControl(void){
 
 void TestModeSetup(void){
 	
-	printf("Test setup some shit\n");
+	printf("Test setup...\n");
 	
-	testMode = kBallCollector;
+	testMode = kRawIO;
+	subTestMode = 0;
+	startTest = true;
+	
 };
 
 void TestModeControlLoop(void){
 	
 	int mode = testModeToggleButton->State();
 	
-	switch ((TestModes)mode){
+	if (testMode!=mode || startTest){
+		printf("Switching to test mode %d.", testMode);
+		testMode = (TestModes)mode;
+		startTest = false;
+	}
+	
+	switch (testMode){
+	
+	
+	
+	case kRawIO:
+	{
+		int relay = 8;
+		if (testRelay==NULL){
+			
+			testRelay = new Relay(relay, Relay::kBothDirections);
+		}
+		
+		if (joystickOne->GetRawButton(A_BUTTON)){
+					DEBUG_PRINT("Turning on relay %d!\n", relay);
+					testRelay->Set(Relay::kForward);
+					return;
+				}
+		
+		if (joystickOne->GetRawButton(B_BUTTON)){
+							DEBUG_PRINT("Reverse relay!\n");
+							testRelay->Set(Relay::kReverse);
+							return;
+						}
+		
+		if (joystickOne->GetRawButton(X_BUTTON)){
+									DEBUG_PRINT("Off relay!\n");
+									testRelay->Set(Relay::kOff);
+									return;
+								}
+		
+	}
+	break;
 	
 	/*
-	 *  BallCollectorsystem Test Code 
-	 * 
-	 */
+		 *  BallCollectorsystem Test Code 
+		 * 
+		 */
 	
 	case kBallCollector:
 	{
+		
+		if (ballCollector==NULL){
+			ballCollector = new BallCollectionSystem();
+		}
 		
 		// Must call update method so Fire() will work
 		ballCollector->Update();
@@ -269,13 +340,74 @@ void TestModeControlLoop(void){
 		
 		if (joystickOne->GetRawButton(Y_BUTTON)){
 					DEBUG_PRINT("Firing ball collector!\n");
+					
+					//ballCollector->Fire();
+					
+					ballCollector->Fire();;
+					
+					return;
+				}
+		
+		if (joystickOne->GetRawButton(START_BUTTON)){
+					DEBUG_PRINT("Help: A=ON, B=Off, C=Reverse, Y=Fire\n");
 					ballCollector->On();
 					ballCollector->Fire();
 					return;
 				}
 		
+		ballCollector->Off(); // No button, do nothing
+		break;
+	};
+	
+	case kBallCannon:
+	{
+		
+		ballCollector->Off();
+		
+		if (ballCannon==NULL){
+			ballCannon = new BallCannon();
+			printf("Brought up ball cannon\n");
+		}
+		
+		// Must call update method so Fire() will work
+		ballCannon->Update();
+		
+		float val = joystickOne->GetRawAxis(LEFT_X_AXIS);
+		//DEBUG_PRINT("Raw axis %f\n", val);
+		ballCannon->DirectDriveAngle(val);
+		
+		// Button A turns on
+		if (joystickOne->GetRawButton(A_BUTTON)){
+			DEBUG_PRINT("Turning on ball collector!\n");
+			ballCollector->On();
+			return;
+		}
+		
+		// Button B is off
+		if (joystickOne->GetRawButton(B_BUTTON)){
+			DEBUG_PRINT("Turning off ball collector!\n");
+			ballCollector->Off();
+			return;
+		}
+		
+		if (joystickOne->GetRawButton(X_BUTTON)){
+			DEBUG_PRINT("Reversing ball collector!\n");
+			ballCollector->Reverse();
+			return;
+		}
+		
+		if (joystickOne->GetRawButton(Y_BUTTON)){
+					DEBUG_PRINT("Firing ball collector!\n");
+					
+					//ballCollector->Fire();
+					
+					ballCollector->Fire();;
+					
+					return;
+				}
+		
 		if (joystickOne->GetRawButton(START_BUTTON)){
-					DEBUG_PRINT("Help: A=ON, B=Off, C=Reverse, D=Fire\n");
+					DEBUG_PRINT("Help: A=ON, B=Off, C=Reverse, Y=Fire\n");
 					ballCollector->On();
 					ballCollector->Fire();
 					return;

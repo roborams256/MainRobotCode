@@ -61,3 +61,7 @@ int ToggleButton::State()
 	Update();  //added by mitch so you don't have to update every cycle
 	return m_state;
 }
+
+int ToggleButton::Mode(){
+	return State();
+}

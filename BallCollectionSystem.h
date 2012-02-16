@@ -35,6 +35,7 @@ public:
 	void FireAuto(void);
 	void Hold(void);
 	
+	
 	// TODO implement ball counter
 	DigitalInput *ballSensor;
 	Timer *ballTimer;

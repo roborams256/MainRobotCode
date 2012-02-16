@@ -1,15 +1,18 @@
 Hardware Punch List
 X wire all PWMs for driving
-- check jags for coast/break
-- rewire robot with wire management in mind, check all crimps, solder
-- Hook up launch angle limit sensor
+X check jags for coast/break
+o rewire robot with wire management in mind, check all crimps, solder
+o Hook up launch angle limit sensor
 - Hook up bridge actuator motors and sensors
 - replace belt jaguar with spike and rewire pwm cable to spikes
 - Mount laser
 - Mount camera
-- Mount wifi bridge
+* Mount wifi bridge
 - Add mode select buttons on DIO (DIP switches, jumpers?)
 - Tower ball sensor
+- screws for analog breakout
+- sweeper motor loose
+- Electronics covers
 
 
 

@@ -40,7 +40,7 @@ void AnalogRotoEncoder::Update(){
 	
 	lastReading = thisReading;
 
-	DEBUG_PRINT("ROTO < Last: %d | This: %d | Delta: %d | Turns %d >", 
+	DEBUG_PRINT("ROTO < Last: %d | This: %d | Delta: %d | Turns %d  > \n", 
 			lastReading, thisReading, delta, turns);
 	
 }

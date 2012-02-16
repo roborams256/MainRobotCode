@@ -6,7 +6,7 @@ TriggerWheel::TriggerWheel(int spikeChannel, double launchTime){
 	triggerRelay = new Relay(SPIKE_TRIGGER);  // default should be both directions
 	
 	// start in the hold direction
-	Hold();
+	//Hold();
 	
 	launchPeriod = launchTime; 
 	semi = false;

@@ -56,19 +56,19 @@
 #define 	SPIKE_BELT				3
 #define		SPIKE_SWEEPER			2
 
-#define		SPIKE_TRIGGER			8
+#define		SPIKE_TRIGGER			5
 #define 	TRIGGER_WHEEL_PERIOD_S	1.0  // 1 second wheel spin
 
 
 // Bridge Actuator
-#define SPIKE_BRIDGE_ACTUATOR 	5
+#define SPIKE_BRIDGE_ACTUATOR 	6
 #define DIG_IN_TOP_SENSOR 		3
 #define DIG_IN_BOTTOM_SENSOR 	4
 
 
 // Shooter
 #define ANALOG_INPUT_SHOOTER_ANGLE  4
-#define DIG_IN_ZERO_SENSOR 	5	
+#define DIG_IN_ZERO_SENSOR 	1	
 #define ANGLE_JAG_SCALER 0.15
 
 
@@ -100,8 +100,8 @@
  */
 
 // The roto encoder is on pins 1 and 2
-#define DIO_ENCODER_A 1
-#define DIO_ENCODER_B 2
+#define DIO_ENCODER_A 11
+#define DIO_ENCODER_B 12
 
 
 #define 	DIG_IN_BALL_SENSOR	4

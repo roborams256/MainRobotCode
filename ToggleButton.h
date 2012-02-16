@@ -28,6 +28,7 @@ public:
 	
 	void Update(); //handles all the toggling logic
 	int State(); //does whatever the button is supposed to do when it is turned on/off
+	int Mode();
 
 protected:
 
