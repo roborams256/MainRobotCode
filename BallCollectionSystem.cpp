@@ -39,6 +39,13 @@ void BallCollectionSystem::Off(void){
 	ballBelt->Off();
 }
 
+void BallCollectionSystem::TotallyOff(void){
+	
+	triggerWheel->Off();
+	sweeper->Off();
+	ballBelt->Off();
+}
+
 
 void BallCollectionSystem::Fire(void){
 	

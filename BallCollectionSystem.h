@@ -26,6 +26,7 @@ public:
 	
 	void On(void);
 	void Off(void);
+	void TotallyOff(void);
 	void Reverse(void);
 	
 	void AutoPause(bool shouldPause);

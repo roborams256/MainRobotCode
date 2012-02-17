@@ -13,6 +13,7 @@ class BallCannon{
 	
 	bool moving;
 	bool calibrating;
+	float targetAngle;
 	
 	
 public:
@@ -21,6 +22,7 @@ public:
 	void SetPower(float);
 	void SetAngle(float);
 	void Calibrate(void);
+	void CancelCal(void);
 	void DirectDriveAngle(float jagVal);
 	void Update(void);
 	

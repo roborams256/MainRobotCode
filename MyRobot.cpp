@@ -7,6 +7,7 @@
 #include "FlexibleScaler.h"
 #include "BallCollectionSystem.h"
 #include "BallCannon.h"
+#include "BridgeActuator.h"
 #include <stdio.h>
 
 #define TEST_MODE
@@ -31,17 +32,18 @@ class RobotDemo : public SimpleRobot
 	BallCollectionSystem *ballCollector;
 	BallCannon *ballCannon;
 	Sweeper *ballSweeper;
+	BridgeActuator *bridgeSlapper;
 	
 	
 	enum TestModes {
 		kRawIO,
 		kBallCollector,
 		kBallCannon,
+		kBridgeActuator,
 		kDriveTrain,
 		kAllSensors,
 		kUltrasonic,
-		kJoysticks,
-		kBridgeActuator,
+		kJoysticks,		
 		kTestEnd
 	};
 	
@@ -98,6 +100,7 @@ public:
 		lastSubTestMode = 0;
 		ballCollector = NULL;
 		ballCannon = NULL;
+		bridgeSlapper = NULL;
 	
 #endif
 		
@@ -364,6 +367,8 @@ void TestModeControlLoop(void){
 		
 		ballCollector->Off();
 		
+		
+		
 		if (ballCannon==NULL){
 			ballCannon = new BallCannon();
 			printf("Brought up ball cannon\n");
@@ -376,23 +381,23 @@ void TestModeControlLoop(void){
 		//DEBUG_PRINT("Raw axis %f\n", val);
 		ballCannon->DirectDriveAngle(val);
 		
-		// Button A turns on
+		// Button A turns on call
 		if (joystickOne->GetRawButton(A_BUTTON)){
-			DEBUG_PRINT("Turning on ball collector!\n");
-			ballCollector->On();
+			DEBUG_PRINT("Starting calibration\n");
+			ballCannon->Calibrate();
 			return;
 		}
 		
 		// Button B is off
 		if (joystickOne->GetRawButton(B_BUTTON)){
-			DEBUG_PRINT("Turning off ball collector!\n");
-			ballCollector->Off();
+			//DEBUG_PRINT("Turning off ball collector!\n");
+			//ballCollector->Off();
 			return;
 		}
 		
 		if (joystickOne->GetRawButton(X_BUTTON)){
-			DEBUG_PRINT("Reversing ball collector!\n");
-			ballCollector->Reverse();
+			//DEBUG_PRINT("Reversing ball collector!\n");
+			ballCannon->CancelCal();
 			return;
 		}
 		
@@ -414,6 +419,42 @@ void TestModeControlLoop(void){
 				}
 		
 		ballCollector->Off(); // No button, do nothing
+		break;
+	};
+	
+	case kBridgeActuator:
+	{
+		
+		ballCollector->Off();
+		ballCannon->SetPower(0);
+		
+		
+		
+		if (bridgeSlapper==NULL){
+			bridgeSlapper = new BridgeActuator();
+			printf("Brought up slapper\n");
+		}
+		
+		// Must call update method so Fire() will work
+		bridgeSlapper->Update();
+		
+		
+		
+		// Button A deployd
+		if (joystickOne->GetRawButton(A_BUTTON)){
+			DEBUG_PRINT("Deploy bridge\n");
+			bridgeSlapper->Deploy();
+			return;
+		}
+		
+		
+		if (joystickOne->GetRawButton(X_BUTTON)){
+			DEBUG_PRINT("Undeploy bridge splapper\n");
+			bridgeSlapper->Undeploy();
+			return;
+		}
+		
+	
 		break;
 	};
 	

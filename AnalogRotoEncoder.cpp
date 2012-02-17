@@ -11,43 +11,40 @@ AnalogRotoEncoder::AnalogRotoEncoder(UINT32 analogChannel){
 	
 float AnalogRotoEncoder::GetAngle(){
 	
-	return 29.0;
+	return angle;
 	
 }
 
-void AnalogRotoEncoder::SetStartPosition(){
-	
-	turns = 0;
-	lastReading = analogInput->GetValue();
-	
-}
 	
 
 void AnalogRotoEncoder::Update(){
 	
 	
-	int thisReading = analogInput->GetValue();
+	GetRaw();
 	
-	int delta = thisReading - lastReading;
-	
-	if ( delta > 450 )
-		turns++;
-	else if ( delta < 450 )
-		turns--;
-	
-	if (turns<0)
-		turns = 0; // This should never happen if correctly calibrated
-	
-	lastReading = thisReading;
-
-	DEBUG_PRINT("ROTO < Last: %d | This: %d | Delta: %d | Turns %d  > \n", 
-			lastReading, thisReading, delta, turns);
 	
 }
 
 
+
+
 float AnalogRotoEncoder::GetRaw(){
 	
-	return analogInput->GetValue();
+	float rval = analogInput->GetVoltage();
+	
+	angle = UPPER_LIMIT_ANGLE_DEGREES +(rval-upLimitVoltage)*DEGREES_PER_VOLT;
+	
+	return rval;
+	
+}
+
+void AnalogRotoEncoder::SetStartAngle(void){
+	
+	// Call this method to set the starting voltage for the encoder at the upper limit
+	//angle = UPPER_LIMIT_ANGLE_DEGREES;
+	
+	angle = UPPER_LIMIT_ANGLE_DEGREES;
+	upLimitVoltage = analogInput->GetVoltage();
+	
 	
 }

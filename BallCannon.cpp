@@ -16,6 +16,9 @@ BallCannon::BallCannon(void){
 	calibrating = false;
 	moving = false;
 	
+	//temp hack
+	angleEncoder->SetStartAngle();
+	
 }
 
 void BallCannon::SetPower(float power){
@@ -27,12 +30,19 @@ void BallCannon::SetPower(float power){
 
 void BallCannon::CalibrationLoop(void){
 	
-	if ( !zeroSensor->Get() ){		
+	if ( !zeroSensor->Get() && calibrating ){		
 		angleJag->Set(0.0);
-		angleEncoder->SetStartPosition();
+		angleEncoder->SetStartAngle();
 		calibrating = false;
 		moving = false;		
 	}	
+	else 
+	{
+		moving = true;
+		calibrating = true;
+		angleJag->Set(-0.25);
+	}
+	
 }
 
 
@@ -41,31 +51,46 @@ void BallCannon::Update(void){
 	angleEncoder->Update();
 	
 	if ( calibrating ) {
+		DEBUG_PRINT("BC update calibrate\n");
 		CalibrationLoop();
 		return;
 	}
 	
 	if ( moving ){
 		
+	
 	}
+	
+	DEBUG_PRINT("BC update normal");
 	
 }
 
-void BallCannon::SetAngle(float){
+void BallCannon::SetAngle(float tAngle){
+	
+	targetAngle = tAngle;
+	
 	
 }
 
 void BallCannon::Calibrate(void){
 	
+	calibrating = true;
+	
+}
+
+void BallCannon::CancelCal(void){
+	
+	calibrating = false;
 }
 
 void BallCannon::DirectDriveAngle(float jagVal){
 	
-	DEBUG_PRINT("Cannon driven with: %1.3f sensor reads %d\n", jagVal, zeroSensor->Get());
+	DEBUG_PRINT("Raw V %1,4f Angle reads %1.4f limit is %d\n", angleEncoder->GetRaw(), angleEncoder->GetAngle(), zeroSensor->Get());
 	//if ( !zeroSensor->Get() && ( jagVal > 0 ) )
 	//	return;
 	
-	angleJag->Set( ANGLE_JAG_SCALER * jagVal );
+	if (!calibrating)
+		angleJag->Set( ANGLE_JAG_SCALER * jagVal );
 	
 	
 }

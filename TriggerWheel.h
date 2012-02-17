@@ -27,6 +27,7 @@ private:
 public:
 	
 	TriggerWheel(int spikeChannel, double launnchTime);
+	void Off(void);
 	void Hold(void);
 	void FireAuto(void);
 	void FireSemiAuto(void);

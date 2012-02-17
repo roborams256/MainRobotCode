@@ -17,6 +17,12 @@ TriggerWheel::TriggerWheel(int spikeChannel, double launchTime){
 	
 }
 
+void TriggerWheel::Off(void){
+		
+	triggerRelay->Set(Relay::kOff);
+		
+}
+
 void TriggerWheel::Hold(void){
 		
 	triggerRelay->Set(Relay::kReverse);

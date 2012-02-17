@@ -12,15 +12,19 @@
 class AnalogRotoEncoder {
 	
 	AnalogChannel *analogInput;
-	int lastReading;
-	int turns;
+	float lastReading;
+	float upLimitVoltage;
+	float angle;
+	
+	
+	
 	
 public:
 	
 	AnalogRotoEncoder(UINT32 analogChannel);
 	
 	float GetAngle();
-	void SetStartPosition();
+	void SetStartAngle();
 	void Update();
 	float GetRaw();
 	

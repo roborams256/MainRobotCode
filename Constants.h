@@ -71,6 +71,12 @@
 #define DIG_IN_ZERO_SENSOR 	1	
 #define ANGLE_JAG_SCALER 0.15
 
+#define UPPER_LIMIT_ANGLE_DEGREES  63.0 	// Measured 
+#define LOWER_LIMIT_ANGLE_DEGREES -68.0 	// Measured
+#define PARALLEL_VOLTAGE  2.15			// MEasured
+#define UP_45_VOLTAGE 3.57
+#define DEGREES_PER_VOLT	31.69 //(45/(UP_45_VOLTAGE-PARALLEL_VOLTAGE)) // At about parallel we are at about 2V less 
+
 
 
 // Digital Outputs
