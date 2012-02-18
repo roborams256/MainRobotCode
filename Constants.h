@@ -62,14 +62,14 @@
 
 // Bridge Actuator
 #define SPIKE_BRIDGE_ACTUATOR 	6
-#define DIG_IN_TOP_SENSOR 		3
-#define DIG_IN_BOTTOM_SENSOR 	4
+#define DIG_IN_TOP_SENSOR 		11
+#define DIG_IN_BOTTOM_SENSOR 	12
 
 
 // Shooter
 #define ANALOG_INPUT_SHOOTER_ANGLE  4
 #define DIG_IN_ZERO_SENSOR 	1	
-#define ANGLE_JAG_SCALER 0.15
+#define ANGLE_JAG_SCALER 0.35
 
 #define UPPER_LIMIT_ANGLE_DEGREES  63.0 	// Measured 
 #define LOWER_LIMIT_ANGLE_DEGREES -68.0 	// Measured
@@ -105,9 +105,9 @@
  * 
  */
 
-// The roto encoder is on pins 1 and 2
-#define DIO_ENCODER_A 11
-#define DIO_ENCODER_B 12
+// The roto encoder is on...
+#define DIO_ENCODER_A 14
+#define DIO_ENCODER_B 13
 
 
 #define 	DIG_IN_BALL_SENSOR	4
@@ -140,11 +140,18 @@ GetThrottle() reads analog triggers (positive right, neg left)
 #define DRIVE_GEAR_TEETH 15
 #define WHEEL_GEAR_TEETH 24
 // use this to adjust the math
-#define EMPIRICAL_ADJUST 1.0
+#define EMPIRICAL_ADJUST (46.0/50.0)  // measured in lab
 
 
 // Don't mess with the formula!
 #define INCHES_PER_TICK  EMPIRICAL_ADJUST * WHEEL_DIAMETER * PI * DRIVE_GEAR_TEETH / WHEEL_GEAR_TEETH / 360
 
 
+/*
+ * 
+ * Smooth Drive
+ * 
+ * */
 
+#define LDRIVEWINDOW 3
+#define RDRIVEWINDOW 3

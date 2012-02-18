@@ -5,6 +5,7 @@ class BridgeActuator{
 	
 public:
 	
+	DriverStationLCD *lcd;
 	Relay *relay;
 	bool deploying;
 	bool inMotion;

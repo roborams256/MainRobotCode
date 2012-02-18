@@ -11,13 +11,17 @@ class BallCannon{
 	
 	AnalogRotoEncoder *angleEncoder;
 	
-	bool moving;
-	bool calibrating;
+
+	
 	float targetAngle;
 	
 	
 public:
 	
+	bool isCalibrated;
+	bool atTargetAngle;
+	bool moving;
+	bool calibrating;
 	BallCannon(void);
 	void SetPower(float);
 	void SetAngle(float);
@@ -25,6 +29,8 @@ public:
 	void CancelCal(void);
 	void DirectDriveAngle(float jagVal);
 	void Update(void);
+	void AutoUpdateMoving(void);
+	float GetCurrentAngle(void);
 	
 private:
 	void CalibrationLoop(void);
