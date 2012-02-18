@@ -137,11 +137,11 @@ void BallCannon::DirectDriveAngle(float jagVal){
 	
 	if (!calibrating ) { // This is user motion, not auto{
 		// Soft limits
-		if ((angleEncoder->GetAngle() > 60.0) && (jagVal < 0))
-					return;
+		//if ((angleEncoder->GetAngle() > 60.0) && (jagVal < 0))
+		//			return;
 		
-		if ((angleEncoder->GetAngle() < -20.0) && (jagVal > 0) )
-					return;
+		//if ((angleEncoder->GetAngle() < -20.0) && (jagVal > 0) )
+		//			return;
 		
 		angleJag->Set( ANGLE_JAG_SCALER * jagVal );
 			

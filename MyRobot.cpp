@@ -136,15 +136,14 @@ public:
 	
 /*void lUpdateDrive(int joyVal)
 {
-	float qv = lDriveQueue.pop();
+	float qv = lDriveQueue.pop() || 0;
 	lDriveSum = ((lDriveSum * lDriveWindow) - qv + joyVal) / lDriveWindow; 
 	lDriveQueue.push(joyVal);
 };
 
 void rUpdateDrive(int joyVal)
 {
-	float qv = rDriveQueue.pop();
-	if (qv == NULL) return;
+	float qv = rDriveQueue.pop() || 0;
 	rDriveSum = ((rDriveSum * rDriveWindow) - qv + joyVal) / rDriveWindow; 
 	rDriveQueue.push(joyVal);
 };*/
@@ -199,14 +198,14 @@ void SimpleAutonOne(void){
 			ballCannon->Update();
 		
 		
-		Wait(10.0);
+		Wait(2.0);
 		
 		//AutonDriveInches( DISTANCE_FROM_KEY_TO_WALL - DISTANCE_BUMPER_WIDTH, 0.55 );
 		
-		AutonDriveInches( 100.0, 0.45 );
+		AutonDriveInches( AUTON_DIST, 0.45 );
 				
 		
-		ballCannon->SetAngle(20.0);
+		ballCannon->SetAngle(AUTON_BALL_ANGLE);
 		// need to manually update it, no loop
 		ballCannon->AutoUpdateMoving();
 		
@@ -251,8 +250,8 @@ void Autonomous(void){
 		
 		leroyDrive->SetSafetyEnabled(false);
 		
-		//SimpleAutonOne();
-		SimpleAuton3Pointer();
+		SimpleAutonOne();
+		//SimpleAuton3Pointer();
 }
 
 void OperatorModeSetup(void){
@@ -274,7 +273,7 @@ void OperatorModeControlLoop(void){
 	ballCannon->DirectDriveAngle(joystickTwo->GetRawAxis(LEFT_Y_AXIS));
 	
 	if ( joystickTwo->GetRawButton(A_BUTTON) ){
-		ballCannon->SetPower(0.35);
+		ballCannon->SetPower(0.25);
 		ballCollector->FireAuto();
 	} 
 	else if ( joystickTwo->GetRawButton(B_BUTTON) ){
@@ -295,7 +294,9 @@ void OperatorModeControlLoop(void){
 		else if ( joystickOne->GetRawButton(X_BUTTON) ){
 			bridgeSlapper->Undeploy();
 		} 
-			
+		
+	dsLCD->Printf(DriverStationLCD:: kUser_Line4, 1, "BC: [%1.2f]", ballCannon->GetCurrentAngle());
+	dsLCD->UpdateLCD();
 	
 }
 	
