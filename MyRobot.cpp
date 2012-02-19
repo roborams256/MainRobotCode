@@ -10,6 +10,7 @@
 #include "BridgeActuator.h"
 #include <stdio.h>
 #include <queue>
+#include <math.h>  // needed for fabs() in auton drive methods
 
 //#define TEST_MODE
 
@@ -34,6 +35,8 @@ class RobotDemo : public SimpleRobot
 	BallCannon *ballCannon;
 	
 	BridgeActuator *bridgeSlapper;
+	Gyro *gyro;
+	bool traversingBridge;
 	
 	float lDriveSum;
 	float rDriveSum;
@@ -41,13 +44,14 @@ class RobotDemo : public SimpleRobot
 	int rDriveWindow;
 	queue<float> lDriveQueue;
 	queue<float> rDriveQueue;
+	ToggleButton *ballCollectorToggle;
 	
 	enum TestModes {
 		kRawIO,
+		kBridgeActuator,
 		kDriveTrain,
 		kBallCollector,
 		kBallCannon,
-		kBridgeActuator,
 		kAllSensors,
 		kUltrasonic,
 		kJoysticks,		
@@ -60,6 +64,9 @@ class RobotDemo : public SimpleRobot
 	ToggleButton *testSubModeToggleButton;
 	DigitalInput *dinA;
 	DigitalInput *dinB;
+	AnalogChannel *aIn;
+	
+	ADXL345_I2C *accel;
 	Jaguar *testJag;
 	Relay *testRelay;
 	bool startTest;
@@ -81,6 +88,7 @@ public:
 		joystickTwo = new Joystick(2);
 		
 		dsLCD = DriverStationLCD::GetInstance();
+		gyro = new Gyro(1);
 		
 		// The FlexibleScaler object provides 4 different ways of scaling the joystick inputs
 		// to provide different "feels" and limits for the joystick. In this one, we are using
@@ -93,6 +101,8 @@ public:
 		driveEncoder->SetDistancePerPulse(INCHES_PER_TICK);
 		driveEncoder->Start();
 		
+		traversingBridge = false;
+		
 		lDriveSum = 0;
 		rDriveSum = 0;
 		lDriveWindow = LDRIVEWINDOW;
@@ -101,8 +111,8 @@ public:
 		deque<float> rqinit (rDriveWindow, 0);
 		lDriveQueue = queue<float>(lqinit);
 		rDriveQueue = queue<float>(rqinit);
-		//for (int i = 0; i < lDriveWindow; i++) lDriveQueue.push(0); //initialize these for SMOOOTHNESS
-		//for (int i = 0; i < rDriveWindow; i++) rDriveQueue.push(0);
+		
+
 		
 		// Initialize the ball collection system
 		
@@ -110,7 +120,7 @@ public:
 		ballCollector = new BallCollectionSystem();
 		ballCannon = new BallCannon();
 		bridgeSlapper = new BridgeActuator();
-		
+		ballCollectorToggle = new ToggleButton(joystickOne, LB_BUTTON, 1);	
 		
 #endif
 		
@@ -126,8 +136,13 @@ public:
 		ballCollector = NULL;
 		ballCannon = NULL;
 		bridgeSlapper = NULL;
-		dinA = new DigitalInput(DIG_IN_TOP_SENSOR);
-		dinB = new DigitalInput(DIG_IN_BOTTOM_SENSOR);
+		dinA = new DigitalInput(7);
+		dinB = new DigitalInput(8);
+		aIn = new AnalogChannel(8);
+		
+		//gyro->SetSensitivity(0.0007);
+		
+		accel = new ADXL345_I2C(1);
 				
 	
 #endif
@@ -163,7 +178,7 @@ void TankDriveMe(){
 		float rdrive = lJoyVal;//rDriveSum;//0.85*joystickOne->GetRawAxis(LEFT_Y_AXIS);
 		float ldrive = rJoyVal;//lDriveSum;//0.85*joystickOne->GetRawAxis(RIGHT_Y_AXIS);
 				
-		DEBUG_PRINT("Left drive:[%f] | Right drive:[%f]\n", ldrive, rdrive);		
+		//DEBUG_PRINT("Left drive:[%f] | Right drive:[%f]\n", ldrive, rdrive);		
 	    
 		leroyDrive->TankDrive(-ldrive, -rdrive); /* changing direction sense */
 	    
@@ -175,6 +190,32 @@ void AutonDriveInches(float inches, float speed){
 		
 		while ( driveEncoder->GetDistance() < inches ){
 			dsLCD->Printf(DriverStationLCD:: kUser_Line1, 1, "Auton: %1.2f inches");
+			dsLCD->UpdateLCD();
+			}
+								
+		leroyDrive->Drive(0.0, 0.0); 	// stop robot
+
+};
+
+void AutonDriveInchesGyro(float inches, float speed){
+	
+		gyro->Reset();
+		
+		driveEncoder->Reset();
+		
+		// Neg inches is backwards so drive backwards
+		if (inches<0)
+			speed = -speed;
+		
+		// We really only care about the absolute val since direction is controlled by speed
+				
+		inches = fabs(inches);  
+		
+		while ( fabs(driveEncoder->GetDistance()) < inches ){
+			float angle = gyro->GetAngle();
+			leroyDrive->Drive(speed, angle/10.0); 
+			dsLCD->Printf(DriverStationLCD:: kUser_Line1, 1, "Auton: %1.2f inches", inches-driveEncoder->GetDistance());
+			dsLCD->Printf(DriverStationLCD:: kUser_Line2, 1, "Gyro: %1.2f deg", angle);
 			dsLCD->UpdateLCD();
 			}
 								
@@ -245,19 +286,29 @@ void SimpleAuton3Pointer(void){
 		ballCollector->FireAuto();
 		
 }
+
+void GyroAutonTest(){
+	
+	Wait(3.0);
+	AutonDriveInchesGyro(60.0, 0.35);
+}
+
+
 	
 void Autonomous(void){
 		
 		leroyDrive->SetSafetyEnabled(false);
 		
-		SimpleAutonOne();
+		//SimpleAutonOne();
 		//SimpleAuton3Pointer();
+		 GyroAutonTest();
 }
 
 void OperatorModeSetup(void){
 		
 		DEBUG_PRINT("Normal operator mode. In setup.\n");
 		ballCannon->Calibrate();
+		bridgeSlapper->Undeploy();
 		
 		
 }
@@ -266,37 +317,70 @@ void OperatorModeSetup(void){
 
 void OperatorModeControlLoop(void){
 		
-	TankDriveMe();
-	ballCollector->On(); /*  rg */
 	
-	ballCannon->Update();
-	ballCannon->DirectDriveAngle(joystickTwo->GetRawAxis(LEFT_Y_AXIS));
 	
-	if ( joystickTwo->GetRawButton(A_BUTTON) ){
-		ballCannon->SetPower(0.25);
-		ballCollector->FireAuto();
-	} 
-	else if ( joystickTwo->GetRawButton(B_BUTTON) ){
-		ballCannon->SetPower(0.50);
-		ballCollector->FireAuto();
-	} 
-	else if ( joystickTwo->GetRawButton(Y_BUTTON) ){
-		ballCannon->SetPower(1.0);
-		ballCollector->FireAuto();
-	} 
-	else {
-		ballCollector->Hold();
-	}
+	if (!traversingBridge){
+		TankDriveMe();
+		ballCollector->On(); /*  rg */
 	
-	if ( joystickOne->GetRawButton(B_BUTTON) ){
-			bridgeSlapper->Deploy();
+		ballCannon->Update();
+		ballCannon->DirectDriveAngle(joystickTwo->GetRawAxis(LEFT_Y_AXIS));
+	
+		int bcstate = ballCollectorToggle->State();
+	
+		if (bcstate == 0)
+			ballCollector->Off();
+		else if (bcstate == 1)
+			ballCollector->On();
+	
+		if ( joystickTwo->GetRawButton(A_BUTTON) ){
+			ballCannon->SetPower(0.30);
+			ballCollector->FireAuto();
 		} 
-		else if ( joystickOne->GetRawButton(X_BUTTON) ){
-			bridgeSlapper->Undeploy();
+		else if ( joystickTwo->GetRawButton(B_BUTTON) ){
+			ballCannon->SetPower(0.50);
+			ballCollector->FireAuto();
 		} 
+		else if ( joystickTwo->GetRawButton(Y_BUTTON) ){
+			ballCannon->SetPower(1.0);
+			ballCollector->FireAuto();
+		} 
+		else {
+			ballCollector->Hold();
+		}
+	
+		if ( joystickOne->GetRawButton(B_BUTTON) ){
+				
+				traversingBridge=true;
+			} 
+		if ( joystickOne->GetRawButton(X_BUTTON) ){
+				bridgeSlapper->Undeploy();
+			} 
 		
-	dsLCD->Printf(DriverStationLCD:: kUser_Line4, 1, "BC: [%1.2f]", ballCannon->GetCurrentAngle());
-	dsLCD->UpdateLCD();
+		dsLCD->Printf(DriverStationLCD:: kUser_Line4, 1, "BC: [%1.2f]", ballCannon->GetCurrentAngle());
+		dsLCD->UpdateLCD();
+	}
+	else {
+		// traversing Bridge
+		
+		dsLCD->Printf(DriverStationLCD:: kUser_Line1, 1, "Bridge Auto Mode");
+		dsLCD->UpdateLCD();
+		
+		
+		AutonDriveInchesGyro(-1.0, 0.45);
+		
+		Wait(1.0);
+		bridgeSlapper->Deploy();
+		
+		Wait(2.0);
+		AutonDriveInchesGyro(24.0, 0.45);
+		bridgeSlapper->Undeploy();
+		AutonDriveInchesGyro(10.0, 0.75);
+		
+		// 60" below is perfect for traverse
+		AutonDriveInchesGyro(38.5, 0.45);
+		traversingBridge=false;
+	}
 	
 }
 	
@@ -364,6 +448,7 @@ void TestModeSetup(void){
 	testMode = kRawIO;
 	subTestMode = 0;
 	startTest = true;
+	//gyro->Reset();
 	
 };
 
@@ -386,9 +471,12 @@ void TestModeControlLoop(void){
 	
 	case kRawIO:
 	{
-		dsLCD->Printf(DriverStationLCD:: kUser_Line1, 1, "LeRoy, here. I am in RAW I/O test mode.");
+		dsLCD->Printf(DriverStationLCD:: kUser_Line1, 1, "BRIDGE I/O TEST");
+		dsLCD->Printf(DriverStationLCD:: kUser_Line2, 2, "B/Dep X/Undep");
+		dsLCD->Printf(DriverStationLCD:: kUser_Line3, 2, "A/Off");
+		dsLCD->Printf(DriverStationLCD:: kUser_Line4, 1, "X %1.2lf",accel->GetAcceleration(ADXL345_I2C::kAxis_Z));
 		printf("DIN A: %d  DIN B: %d\n", dinA->Get(), dinB->Get());
-		int relay = SPIKE_BRIDGE_ACTUATOR;
+		int relay = 7;
 		if (testRelay==NULL){
 			
 			testRelay = new Relay(relay, Relay::kBothDirections);
@@ -406,15 +494,7 @@ void TestModeControlLoop(void){
 				}
 		
 		// UNDEPLOY
-		if (joystickOne->GetRawButton(B_BUTTON)){
-							DEBUG_PRINT("Turning on relay %d!\n", relay);
-							
-							while (!dinB->Get() || joystickOne->GetRawButton(Y_BUTTON))
-								testRelay->Set(Relay::kForward);
-							
-							testRelay->Set(Relay::kOff);
-							return;
-						}
+
 		
 		if (joystickOne->GetRawButton(B_BUTTON)){
 							DEBUG_PRINT("Reverse relay!\n");
@@ -438,10 +518,25 @@ void TestModeControlLoop(void){
 	
 	case kBallCollector:
 	{
-		dsLCD->Printf(DriverStationLCD:: kUser_Line1, 1, "LeRoy, here. I am in BALL COLLECTOR test mode.");
+		dsLCD->Printf(DriverStationLCD:: kUser_Line1, 1, "BALL COLLECTOR TEST");
+		dsLCD->Printf(DriverStationLCD:: kUser_Line2, 2, "A/On B/Off");
+		dsLCD->Printf(DriverStationLCD:: kUser_Line3, 2, "X/Rev");
+		
+		
+		
+		
 		if (ballCollector==NULL){
 			ballCollector = new BallCollectionSystem();
 		}
+		
+		if (ballCannon==NULL){
+			ballCannon = new BallCannon();
+			ballCannon->SetPower(0.35);
+			printf("Brought up ball cannon\n");
+		}
+		
+		
+		
 		
 		// Must call update method so Fire() will work
 		ballCollector->Update();
@@ -483,27 +578,31 @@ void TestModeControlLoop(void){
 					return;
 				}
 		
-		ballCollector->Off(); // No button, do nothing
+		
 		break;
 	};
 	
 	case kBallCannon:
 	{
-		dsLCD->Printf(DriverStationLCD:: kUser_Line1, 1, "LeRoy, here. I am in BALL CANNON test mode.");
-		ballCollector->Off();
+		
+		
+
+				
+		dsLCD->Printf(DriverStationLCD:: kUser_Line1, 1, "BALL CANNON TEST");
+		dsLCD->Printf(DriverStationLCD:: kUser_Line2, 2, "A/Cal X/Cal Off");
+		dsLCD->Printf(DriverStationLCD:: kUser_Line3, 3, "Y/45 deg");
+		
+		ballCollector->On();
 		
 		
 		
-		if (ballCannon==NULL){
-			ballCannon = new BallCannon();
-			printf("Brought up ball cannon\n");
-					}
+
 		
 		// Must call update method so Fire() will work
 		ballCannon->Update();
 		
 		float val = joystickOne->GetRawAxis(LEFT_X_AXIS);
-		//DEBUG_PRINT("Raw axis %f\n", val);
+		DEBUG_PRINT("Raw axis %f\n", val);
 		ballCannon->DirectDriveAngle(val);
 		
 		// Button A turns on call
@@ -545,17 +644,22 @@ void TestModeControlLoop(void){
 		
 		ballCollector->Off(); // No button, do nothing
 		
-		dsLCD->Printf(DriverStationLCD:: kUser_Line3, 1, "Angle: %1.2f", ballCannon->GetCurrentAngle());
+		dsLCD->Printf(DriverStationLCD:: kUser_Line5, 1, "%1.2f deg | %d", ballCannon->GetCurrentAngle(),
+				ballCannon->GetLimitSensor());
 				
 		break;
 	};
 	
 	case kBridgeActuator:
 	{
-		dsLCD->Printf(DriverStationLCD:: kUser_Line1, 1, "LeRoy, here. I am in BRIDGE SLAPPER test mode.");
-		DEBUG_PRINT("Bridge splapper\n");
-		ballCollector->Off();
-		ballCannon->SetPower(0);
+		dsLCD->Printf(DriverStationLCD:: kUser_Line1, 1, "BRIDGE SLAP TEST");
+		dsLCD->Printf(DriverStationLCD:: kUser_Line2, 2, "B/Deploy");
+		dsLCD->Printf(DriverStationLCD:: kUser_Line3, 2, "X/Undeploy");
+		//dsLCD->Printf(DriverStationLCD:: kUser_Line1, 1, "LeRoy, here. I am in BRIDGE SLAPPER test mode.");
+		//DEBUG_PRINT("Bridge splapper\n");
+		
+		//ballCollector->Off();
+		//ballCannon->SetPower(0);
 		
 		
 		
@@ -565,13 +669,13 @@ void TestModeControlLoop(void){
 		}
 		
 		// Must call update method so Fire() will work
-		bridgeSlapper->Update();
+		//bridgeSlapper->Update();
 		
 		
 		
 		// Button A deployed
-		if (joystickOne->GetRawButton(A_BUTTON)){
-			DEBUG_PRINT("Deploy bridge\n");
+		if (joystickOne->GetRawButton(B_BUTTON)){
+			//DEBUG_PRINT("Deploy bridge\n");
 			bridgeSlapper->Deploy();
 			return;
 		}
@@ -584,12 +688,13 @@ void TestModeControlLoop(void){
 		}
 		
 	
-		break;
-	};
+		
+	}
+	break;
 	
 	case kDriveTrain:
 		{
-			dsLCD->Printf(DriverStationLCD:: kUser_Line1, 1, "LeRoy, here. I am in BASIC DRIVETRAIN test mode.");
+			dsLCD->Printf(DriverStationLCD:: kUser_Line1, 1, "DRIVETRAIN TEST");
 			if (joystickOne->GetRawButton(A_BUTTON)){
 				DEBUG_PRINT("Switching to unscaled drive!\n");
 				tankDriveScaler->SetModeAndScaler(FlexibleScaler::kScaleUnity, 1.0);

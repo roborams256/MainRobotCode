@@ -79,7 +79,10 @@
 
 
 
-// Digital Outputs
+// Ultrasound
+
+#define AIN_ULTRASONIC 8
+#define USOUND_INCH_PER_V 0.0098
 
 
 

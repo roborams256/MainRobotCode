@@ -28,6 +28,11 @@ BallCannon::BallCannon(void){
 	
 }
 
+int BallCannon::GetLimitSensor(void){
+	
+	return zeroSensor->Get();
+}
+
 float BallCannon::GetCurrentAngle(void){
 	
 	float rval = angleEncoder->GetAngle();
@@ -132,8 +137,8 @@ void BallCannon::DirectDriveAngle(float jagVal){
 	//DEBUG_PRINT("Raw V %1,4f Angle reads %1.4f limit is %d\n", angleEncoder->GetRaw(), angleEncoder->GetAngle(), zeroSensor->Get());
 	//if ( !zeroSensor->Get() && ( jagVal > 0 ) )
 	//	return;
-	if (!isCalibrated)
-		return; // can't use if not cal'd
+	//if (!isCalibrated)
+	//	return; // can't use if not cal'd
 	
 	if (!calibrating ) { // This is user motion, not auto{
 		// Soft limits

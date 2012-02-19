@@ -24,7 +24,7 @@ void Sweeper::On(void)
 	relay->Set(motorDirection);
 	isOn = true;
 
-	DEBUG_PRINT("Sweeper on!\n");
+	//DEBUG_PRINT("Sweeper on!\n");
 	
 }
 

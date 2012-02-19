@@ -31,6 +31,7 @@ public:
 	void Update(void);
 	void AutoUpdateMoving(void);
 	float GetCurrentAngle(void);
+	int GetLimitSensor(void);
 	
 private:
 	void CalibrationLoop(void);
