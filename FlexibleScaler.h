@@ -5,10 +5,9 @@ class FlexibleScaler {
 public:
 	
 	enum ScaleModes {
-		kScaleUnity,
 		kScaleLinear,
 		kScalePower2,
-		kScalePower2AndLinear
+		kLPFilter
 	}; 
 	
 
@@ -16,6 +15,8 @@ public:
 	
 	//int scaleMode;
 	float linearScaleValue;
+	float filterTerms;
+	float accumulator;
 	
 	FlexibleScaler();
 	FlexibleScaler(ScaleModes mode, float scale);
