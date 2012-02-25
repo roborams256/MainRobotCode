@@ -158,3 +158,5 @@ GetThrottle() reads analog triggers (positive right, neg left)
 
 #define LDRIVEWINDOW 3
 #define RDRIVEWINDOW 3
+
+#define APOWER_SCALE 0.5
