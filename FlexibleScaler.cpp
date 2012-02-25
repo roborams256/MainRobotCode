@@ -3,27 +3,29 @@
 
 FlexibleScaler::FlexibleScaler(){
 	
-	scaleMode = kScaleUnity;
-	linearScaleValue = 0.5;
+	scaleMode = kScaleLinear;
+	linearScaleValue = 0.85;
+	filterTerms = 10.0;
+	accumulator = 0;
 };
 
 FlexibleScaler::FlexibleScaler(ScaleModes mode, float scale){
 	
 	scaleMode = mode;
 	linearScaleValue = scale;
+	filterTerms = 10.0;
+	accumulator = 0;
+	
 	
 }
 
 float FlexibleScaler::Scale(float input){
 	
-	int sign;
+	float sign;
 	float rval;
 	
 	switch (scaleMode) {
 	
-	case kScaleUnity:  // unity function
-		rval = input;
-		break;
 		
 	case kScaleLinear:
 		
@@ -32,14 +34,15 @@ float FlexibleScaler::Scale(float input){
 		
 		
 	case kScalePower2:
-		sign = (input < 0) ? -1 : 1;
+		sign = (input < 0) ? -1.0 : 1.0;
 		
-		rval = sign * (input * input * 100 ) / 100.0;
+		rval = sign * (input * input );
 		
-		return rval;
+		return rval*linearScaleValue;
 		break;
 		
-	case kScalePower2AndLinear:
+	case kLPFilter:
+		
 		sign = (input < 0) ? -1 : 1;
 		
 		rval = sign * (input * input * 100 ) / 100.0;

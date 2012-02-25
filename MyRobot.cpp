@@ -40,11 +40,13 @@ class RobotDemo : public SimpleRobot
 	
 	float lDriveSum;
 	float rDriveSum;
-	int lDriveWindow;
-	int rDriveWindow;
-	queue<float> lDriveQueue;
-	queue<float> rDriveQueue;
+	float lDriveArray[];
+	float rDriveArray[];
+	int lDriveIndex;
+	int rDriveIndex;
 	ToggleButton *ballCollectorToggle;
+	
+	float bPower;
 	
 	enum TestModes {
 		kRawIO,
@@ -105,12 +107,16 @@ public:
 		
 		lDriveSum = 0;
 		rDriveSum = 0;
-		lDriveWindow = LDRIVEWINDOW;
-		rDriveWindow = RDRIVEWINDOW;
-		deque<float> lqinit (lDriveWindow, 0);
-		deque<float> rqinit (rDriveWindow, 0);
-		lDriveQueue = queue<float>(lqinit);
-		rDriveQueue = queue<float>(rqinit);
+		
+		for (int i = 0; i < LDRIVEWINDOW; i++)
+			lDriveArray[i] = 0;
+		for (int i = 0; i < RDRIVEWINDOW; i++)
+			rDriveArray[i] = 0;
+		
+		lDriveIndex = 0;
+		rDriveIndex = 0;
+		
+		bPower = 0.25;
 		
 
 		
@@ -149,19 +155,25 @@ public:
 		
 };
 	
-/*void lUpdateDrive(int joyVal)
+void lUpdateDrive(float joyVal)
 {
-	float qv = lDriveQueue.pop() || 0;
-	lDriveSum = ((lDriveSum * lDriveWindow) - qv + joyVal) / lDriveWindow; 
-	lDriveQueue.push(joyVal);
+	float qv = lDriveArray[lDriveIndex];
+	lDriveSum = ((lDriveSum * LDRIVEWINDOW) - qv + joyVal) / LDRIVEWINDOW; //take out the old value, put the new one in 
+	lDriveArray[lDriveIndex] = joyVal;
+	lDriveIndex++;
+	if (lDriveIndex > LDRIVEWINDOW)
+		lDriveIndex = 0;
 };
 
-void rUpdateDrive(int joyVal)
+void rUpdateDrive(float joyVal)
 {
-	float qv = rDriveQueue.pop() || 0;
-	rDriveSum = ((rDriveSum * rDriveWindow) - qv + joyVal) / rDriveWindow; 
-	rDriveQueue.push(joyVal);
-};*/
+	float qv = rDriveArray[rDriveIndex];
+	rDriveSum = ((rDriveSum * RDRIVEWINDOW) - qv + joyVal) / RDRIVEWINDOW; //take out the old value, put the new one in 
+	rDriveArray[rDriveIndex] = joyVal;
+	rDriveIndex++;
+	if (rDriveIndex > RDRIVEWINDOW)
+		rDriveIndex = 0;
+};
 	
 void TankDriveMe(){
 		
@@ -172,13 +184,13 @@ void TankDriveMe(){
 		float lJoyVal = 0.85*joystickOne->GetRawAxis(LEFT_Y_AXIS);
 		float rJoyVal = 0.85*joystickOne->GetRawAxis(RIGHT_Y_AXIS);
 	
-		//rUpdateDrive(lJoyVal);
-		//lUpdateDrive(rJoyVal);
+		rUpdateDrive(lJoyVal);
+		lUpdateDrive(rJoyVal);
 	
-		float rdrive = lJoyVal;//rDriveSum;//0.85*joystickOne->GetRawAxis(LEFT_Y_AXIS);
-		float ldrive = rJoyVal;//lDriveSum;//0.85*joystickOne->GetRawAxis(RIGHT_Y_AXIS);
+		float rdrive = rDriveSum;
+		float ldrive = lDriveSum;
 				
-		//DEBUG_PRINT("Left drive:[%f] | Right drive:[%f]\n", ldrive, rdrive);		
+		printf("Left drive:[%f] | Right drive:[%f]\n", ldrive, rdrive);		
 	    
 		leroyDrive->TankDrive(-ldrive, -rdrive); /* changing direction sense */
 	    
@@ -199,7 +211,7 @@ void AutonDriveInches(float inches, float speed){
 
 void AutonDriveInchesGyro(float inches, float speed){
 	
-		gyro->Reset();
+		//gyro->Reset();
 		
 		driveEncoder->Reset();
 		
@@ -211,9 +223,15 @@ void AutonDriveInchesGyro(float inches, float speed){
 				
 		inches = fabs(inches);  
 		
-		while ( fabs(driveEncoder->GetDistance()) < inches ){
+		// X Button on driver's controller cancels out in case of bridge hang
+		while ( (fabs(driveEncoder->GetDistance()) < inches) && !joystickOne->GetRawButton(X_BUTTON) ){
 			float angle = gyro->GetAngle();
+			
+			// The line below uses the angle as an ERROR from 0 degrees. The larger the error, the more 
+			// leroy will turn. Drive(speed, turn) method used below.
+			
 			leroyDrive->Drive(speed, angle/10.0); 
+			
 			dsLCD->Printf(DriverStationLCD:: kUser_Line1, 1, "Auton: %1.2f inches", inches-driveEncoder->GetDistance());
 			dsLCD->Printf(DriverStationLCD:: kUser_Line2, 1, "Gyro: %1.2f deg", angle);
 			dsLCD->UpdateLCD();
@@ -239,11 +257,11 @@ void SimpleAutonOne(void){
 			ballCannon->Update();
 		
 		
-		Wait(2.0);
+		Wait(1.0);
 		
-		//AutonDriveInches( DISTANCE_FROM_KEY_TO_WALL - DISTANCE_BUMPER_WIDTH, 0.55 );
+		//AutonDriveInches( 100.0, 0.55 );
 		
-		AutonDriveInches( AUTON_DIST, 0.45 );
+		AutonDriveInchesGyro( AUTON_DIST, 0.45 );
 				
 		
 		ballCannon->SetAngle(AUTON_BALL_ANGLE);
@@ -252,6 +270,11 @@ void SimpleAutonOne(void){
 		
 		
 		ballCollector->FireAuto();
+		Wait(1.0);
+		ballCollector->Hold();
+		Wait(1.0);
+		ballCollector->FireAuto();
+		
 		
 }
 
@@ -290,6 +313,7 @@ void SimpleAuton3Pointer(void){
 void GyroAutonTest(){
 	
 	Wait(3.0);
+	gyro->Reset();
 	AutonDriveInchesGyro(60.0, 0.35);
 }
 
@@ -299,9 +323,9 @@ void Autonomous(void){
 		
 		leroyDrive->SetSafetyEnabled(false);
 		
-		//SimpleAutonOne();
+		SimpleAutonOne();
 		//SimpleAuton3Pointer();
-		 GyroAutonTest();
+		 //GyroAutonTest();
 }
 
 void OperatorModeSetup(void){
@@ -310,7 +334,7 @@ void OperatorModeSetup(void){
 		ballCannon->Calibrate();
 		bridgeSlapper->Undeploy();
 		
-		
+		DEBUG_PRINT("Done with setup\n");
 }
 
 
@@ -332,17 +356,24 @@ void OperatorModeControlLoop(void){
 			ballCollector->Off();
 		else if (bcstate == 1)
 			ballCollector->On();
+		
+		/*if () ballCannon->apower += joystickTwo->GetRawAxis(RIGHT_Y_AXIS) * APOWER_SCALE; 
+		if (ballCannon->apower > 1.00) ballCannon->apower = 1;
+		if (ballCannon->apower < 0) ballCannon->apower = 0;
+		if (joystickTwo->GetRawButton(LB_BUTTON)) ballCannon->apower = 0.20;*/
+		
+		//dsLCD->Printf(DriverStationLCD:: kUser_Line6, 1, "AP: [%1.2f]", ballCannon->apower);
 	
 		if ( joystickTwo->GetRawButton(A_BUTTON) ){
 			ballCannon->SetPower(0.30);
 			ballCollector->FireAuto();
 		} 
 		else if ( joystickTwo->GetRawButton(B_BUTTON) ){
-			ballCannon->SetPower(0.50);
+			ballCannon->SetPower(0.35);
 			ballCollector->FireAuto();
 		} 
 		else if ( joystickTwo->GetRawButton(Y_BUTTON) ){
-			ballCannon->SetPower(1.0);
+			ballCannon->SetPower(0.40);
 			ballCollector->FireAuto();
 		} 
 		else {
@@ -351,6 +382,8 @@ void OperatorModeControlLoop(void){
 	
 		if ( joystickOne->GetRawButton(B_BUTTON) ){
 				
+			// set 0 angle before traversal so it isn't lost
+				gyro->Reset();
 				traversingBridge=true;
 			} 
 		if ( joystickOne->GetRawButton(X_BUTTON) ){
@@ -367,18 +400,18 @@ void OperatorModeControlLoop(void){
 		dsLCD->UpdateLCD();
 		
 		
-		AutonDriveInchesGyro(-1.0, 0.45);
+		//AutonDriveInchesGyro(-1.0, 0.45);
 		
-		Wait(1.0);
+		//Wait(1.0);
 		bridgeSlapper->Deploy();
 		
-		Wait(2.0);
+		Wait(1.0);
 		AutonDriveInchesGyro(24.0, 0.45);
 		bridgeSlapper->Undeploy();
 		AutonDriveInchesGyro(10.0, 0.75);
 		
 		// 60" below is perfect for traverse
-		AutonDriveInchesGyro(38.5, 0.45);
+		AutonDriveInchesGyro(55.0, 0.45);
 		traversingBridge=false;
 	}
 	

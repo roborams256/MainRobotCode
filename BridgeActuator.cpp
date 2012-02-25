@@ -35,7 +35,7 @@ void BridgeActuator::Deploy(void){
 	while (!highSensor->Get())
 		relay->Set(Relay::kReverse);
 						
-	relay->Set(Relay::kOff);
+	//relay->Set(Relay::kOff);
 	
 }
 

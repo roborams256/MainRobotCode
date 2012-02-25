@@ -22,6 +22,7 @@ BallCannon::BallCannon(void){
 	atTargetAngle=false;
 	isCalibrated = false;
 	
+	
 	//temp hack
 	//angleEncoder->SetStartAngle();
 	
