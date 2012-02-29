@@ -1,3 +1,6 @@
+#ifndef BCS
+#define BCS
+
 #import "WPILib.h"
 #import "Sweeper.h"
 #import "BallBelt.h"
@@ -11,6 +14,7 @@
  * supports feedback from the 3 ball sensor (if enabled).
  * 
  */
+
 
 
 class BallCollectionSystem {
@@ -36,6 +40,8 @@ public:
 	void FireAuto(void);
 	void Hold(void);
 	
+	bool IsFiring(void);
+	
 	
 	// TODO implement ball counter
 	DigitalInput *ballSensor;
@@ -44,3 +50,5 @@ public:
 	
 	
 };
+
+#endif

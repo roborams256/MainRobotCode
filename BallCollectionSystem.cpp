@@ -49,7 +49,7 @@ void BallCollectionSystem::TotallyOff(void){
 
 void BallCollectionSystem::Fire(void){
 	
-	triggerWheel->FireAuto();
+	triggerWheel->FireSemiAuto();
 	
 }
 
@@ -72,10 +72,15 @@ void BallCollectionSystem::Reverse(void){
 	ballBelt->Reverse();
 }
 
+bool BallCollectionSystem::IsFiring(void){
+	
+	return triggerWheel->IsFiring();
+}
+
 void BallCollectionSystem::Update(void){
 	
 	
-	//triggerWheel->Update();
+	triggerWheel->Update();
 	
 }
 

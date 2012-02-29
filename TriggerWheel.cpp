@@ -32,7 +32,7 @@ void TriggerWheel::Hold(void){
 void TriggerWheel::FireAuto(void){
 		
 	triggerRelay->Set(Relay::kForward);
-	DEBUG_PRINT("FIRE!/n");
+	DEBUG_PRINT("FIRE auto\n");
 		
 }
 
@@ -47,9 +47,9 @@ void TriggerWheel::SetLaunchPeriod(double launchTime)
 void TriggerWheel::FireSemiAuto()
 {
 	
+	DEBUG_PRINT("FIRE semiauto\n");
+
 	
-	triggerRelay->Set(Relay::kForward);
-	return;
 	
 	if (semi) return; //don't allow re-firing
 	
@@ -59,7 +59,7 @@ void TriggerWheel::FireSemiAuto()
 	
 	FireAuto();
 	semi = true;
-	DEBUG_PRINT("BANG\n");
+	
 }
 
 void TriggerWheel::FirePulse(void)
@@ -81,14 +81,22 @@ bool TriggerWheel::Pulsing(void)
 	return pulse;
 }
 
+bool TriggerWheel::IsFiring(){
+	return semi;
+}
+
 void TriggerWheel::Update()
 {
+	//DEBUG_PRINT("Timer %lf\n Semi %d\n",timer->Get(), semi);
 	if (semi && timer->HasPeriodPassed(launchPeriod))
 	{
 		Hold();
 		timer->Stop();
 		timer->Reset();
 		semi = false;
+	}
+	else{
+		//DEBUG_PRINT("Timer: %f\n", timer->Get());
 	}
 	
 	return;

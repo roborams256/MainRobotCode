@@ -27,7 +27,6 @@ void AnalogRotoEncoder::Update(){
 
 
 
-
 float AnalogRotoEncoder::GetRaw(){
 	
 	float rval = analogInput->GetVoltage();

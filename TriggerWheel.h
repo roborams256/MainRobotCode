@@ -20,17 +20,19 @@ private:
 	
 	Relay *triggerRelay;
 	double launchPeriod;
-	bool semi;
 	bool pulse;
 	Timer *timer;
 	
 public:
+	bool semi;
+
 	
 	TriggerWheel(int spikeChannel, double launnchTime);
 	void Off(void);
 	void Hold(void);
 	void FireAuto(void);
 	void FireSemiAuto(void);
+	bool IsFiring();
 	void FirePulse(void);
 	void StopPulse(void);
 	bool Pulsing(void);

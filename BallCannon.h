@@ -1,7 +1,10 @@
+#ifndef BALL_CANNON
+#define BALL_CANNON
+
 #import "WPIlib.h"
 #import "AnalogRotoEncoder.h"
 
-class BallCannon{
+class BallCannon {
 	
 	Jaguar *leftJag;
 	Jaguar *rightJag;
@@ -11,9 +14,11 @@ class BallCannon{
 	
 	AnalogRotoEncoder *angleEncoder;
 	
-
-	
 	float targetAngle;
+	float ballSpeed;
+	float spinupDelta;
+	
+	Timer *spinupTimer;
 	
 	
 public:
@@ -22,9 +27,14 @@ public:
 	bool atTargetAngle;
 	bool moving;
 	bool calibrating;
+	
+
+	
 	BallCannon(void);
-	void SetPower(float);
+	void SetSpeed(float);
+	float GetSpeed(void);
 	void SetAngle(float);
+	void PIDSetAngle(float);
 	void Calibrate(void);
 	void CancelCal(void);
 	void DirectDriveAngle(float jagVal);
@@ -32,6 +42,8 @@ public:
 	void AutoUpdateMoving(void);
 	float GetCurrentAngle(void);
 	int GetLimitSensor(void);
+	float GetVoltage();
+	bool AtSpeed();
 
 	
 private:
@@ -39,3 +51,4 @@ private:
 	
 };
 
+#endif
