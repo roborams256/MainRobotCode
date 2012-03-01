@@ -19,7 +19,7 @@ private:
 public:
 	
 	enum States {
-		kWaitingForShot,
+		kStartingShot,
 		kAdjustingSpeed,
 		kAdjustingAngle,
 		kTakeShot,

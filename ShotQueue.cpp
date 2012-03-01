@@ -5,7 +5,7 @@ ShotQueue::ShotQueue(BallCollectionSystem *bcs, BallCannon *bcan){
 	
 	ballCannon = bcan;
 	ballCollector = bcs;
-	currentState = kWaitingForShot;
+	currentState = kStartingShot;
 	
 }
 
@@ -27,9 +27,9 @@ void ShotQueue::Update(void){
 	
 	switch (currentState){
 	
-	case kWaitingForShot:
+	case kStartingShot:
 		// first adjust speed
-		DEBUG_PRINT("\nProcessing Shot\n");
+		//DEBUG_PRINT("\nProcessing Shot\n");
 		ballCannon->SetSpeed(shots.front()->speed);
 		ballCannon->SetAngle(shots.front()->angle);
 		currentState = kAdjustingSpeed;
@@ -37,7 +37,7 @@ void ShotQueue::Update(void){
 		
 	case kAdjustingSpeed:
 		
-		DEBUG_PRINT(".");
+		//DEBUG_PRINT(".");
 		if (ballCannon->AtSpeed()){
 			DEBUG_PRINT("\nAdjusted Speed\n");
 			currentState = kAdjustingAngle;
@@ -75,7 +75,7 @@ void ShotQueue::Update(void){
 	case kRetiringShot:
 		DEBUG_PRINT("\nPopping shot off stack.\n");
 		shots.pop();
-		currentState = kWaitingForShot;
+		currentState = kStartingShot;
 		break;
 		
 	default:

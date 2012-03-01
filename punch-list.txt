@@ -13,11 +13,19 @@ o Hook up launch angle limit sensor
 - screws for analog breakout
 - sweeper motor loose
 - Electronics covers
+- Bumpers
+- Add wooden stiffeners to frame
+- Poor man's omni wheels
+- rivet tread on wheels
+- Debug ball elevator
+
 
 
 
 Software List
 - Debug semi-auto firing
+- Program bridge actuator
+- Gamepad control system
 
 
 

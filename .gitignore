@@ -1,0 +1,13 @@
+#Ignore object files
+ *.[oa]
+ *.o
+ *.a
+ 
+ #Ignore any project files
+ .cproject
+ .project
+ .wrmakefile
+ .wrproject
+ 
+ #Ignore any output files
+ PPC603gnu/*

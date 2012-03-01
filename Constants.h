@@ -45,6 +45,7 @@
 // a Y connector
 #define		PWM_LEFT_DRIVE	 	1
 #define 	PWM_RIGHT_DRIVE	 	2
+#define		SLOW_DRIVE_SCALER	0.5
 
 #define		PWM_LAUNCHER_LEFT	5
 #define		PWM_LAUNCHER_RIGHT	6
@@ -155,8 +156,17 @@ GetThrottle() reads analog triggers (positive right, neg left)
  * Smooth Drive
  * 
  * */
+#define LP_FILTER_TERMS 100
 
-#define LDRIVEWINDOW 3
-#define RDRIVEWINDOW 3
 
-#define APOWER_SCALE 0.5
+// Shooted preset baselines
+
+// Middle basket from bumper
+#define BASELINE_OFFENSE_A_BUTTON_SPEED 0.35
+#define BASELINE_OFFENSE_A_BUTTON_ANGLE 58.0
+
+// Go deep on defense
+#define BASELINE_DEFENSE_A_BUTTON_SPEED 0.85
+#define BASELINE_DEFENSE_A_BUTTON_ANGLE 45.0
+
+

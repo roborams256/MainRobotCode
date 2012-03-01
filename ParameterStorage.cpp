@@ -34,7 +34,7 @@ int ParameterStorage::GetParameterAsInt(char  *parameterName){
         myfile.close();
     }
     else
-        strVal = "-9999";
+        strVal = "9999";
     
     return atoi(strVal);
 
@@ -56,7 +56,7 @@ float ParameterStorage::GetParameterAsFloat(char  *parameterName){
         myfile.close();
     }
     else
-        strVal = "-9999.9999";
+        strVal = "9999.9999";
     
     return atof(strVal);
     

@@ -5,17 +5,26 @@ FlexibleScaler::FlexibleScaler(){
 	
 	scaleMode = kScaleLinear;
 	linearScaleValue = 0.85;
-	filterTerms = 10.0;
-	accumulator = 0;
-};
+	InitFilterQueue();
+	
+	
+}
 
 FlexibleScaler::FlexibleScaler(ScaleModes mode, float scale){
 	
 	scaleMode = mode;
 	linearScaleValue = scale;
-	filterTerms = 10.0;
-	accumulator = 0;
+	InitFilterQueue();
 	
+}
+
+void FlexibleScaler::InitFilterQueue(){
+	
+	filterLength = LP_FILTER_TERMS;
+	
+	for (int i=0; i<filterLength; i++){
+		filterQueue.push_front(0.0);
+	}
 	
 }
 
@@ -43,15 +52,19 @@ float FlexibleScaler::Scale(float input){
 		
 	case kLPFilter:
 		
-		sign = (input < 0) ? -1 : 1;
+		filterQueue.push_front(input);
+		filterQueue.pop_back(); // get rid of the oldest
 		
-		rval = sign * (input * input * 100 ) / 100.0;
+		rval = 0;
 		
-		return rval*linearScaleValue;
+		for (int i=0; i<filterLength; i++)
+			rval = rval + filterQueue[i];
+		
+		return rval/filterLength;
+		
 		break;
 		
 		
-
 		
 	default:
 		return input;

@@ -1,3 +1,5 @@
+#include <deque>
+#include "Constants.h"
 
 class FlexibleScaler {
 	
@@ -13,16 +15,17 @@ public:
 
 	ScaleModes scaleMode;
 	
-	//int scaleMode;
 	float linearScaleValue;
-	float filterTerms;
-	float accumulator;
+	
+	std::deque<float> filterQueue;
+	int filterLength;
 	
 	FlexibleScaler();
 	FlexibleScaler(ScaleModes mode, float scale);
 	
 	float Scale(float input);
 	void SetModeAndScaler(ScaleModes mode, float scale);
+	void FlexibleScaler::InitFilterQueue();
 	
 	
 };
