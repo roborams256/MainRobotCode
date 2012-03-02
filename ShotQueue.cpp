@@ -29,15 +29,17 @@ void ShotQueue::Update(void){
 	
 	case kStartingShot:
 		// first adjust speed
-		//DEBUG_PRINT("\nProcessing Shot\n");
-		ballCannon->SetSpeed(shots.front()->speed);
-		ballCannon->SetAngle(shots.front()->angle);
+		float speed = shots.front()->speed;
+		float angle = shots.front()->angle;
+		DEBUG_PRINT("\nProcessing Shot %1.2f, %1.2f\n", speed, angle);
+		ballCannon->SetSpeed(speed);
+		ballCannon->SetAngle(angle);
 		currentState = kAdjustingSpeed;
 		break;
 		
 	case kAdjustingSpeed:
 		
-		//DEBUG_PRINT(".");
+		DEBUG_PRINT(".");
 		if (ballCannon->AtSpeed()){
 			DEBUG_PRINT("\nAdjusted Speed\n");
 			currentState = kAdjustingAngle;

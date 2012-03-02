@@ -71,6 +71,7 @@ void BallCannon::CalibrationLoop(void){
 		calibrating = false;
 		moving = false;		
 		isCalibrated = true;
+		return;
 	}	
 	else 
 	{
