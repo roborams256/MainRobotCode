@@ -20,6 +20,7 @@ void testButtons(Joystick *joystick);
 
 void testAxis(Joystick *joystick);
 
+//sublime keymap: { "keys": [""], "command": "" },
 
 class RobotDemo : public SimpleRobot
 {
