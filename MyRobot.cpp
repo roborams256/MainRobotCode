@@ -217,19 +217,26 @@ void Autonomous(void){
 		
 	DEBUG_PRINT("In Autonomous::\n");
 	
-	
-	
+	//drive up, shoot to 3-pointer
+	//stay, feed 
+
+	Shot *feedShot = new Shot(BASELINE_OFFENSE_A_BUTTON_SPEED, BASELINE_OFFENSE_A_BUTTON_ANGLE);
+	//To make this actually do anything with this, we just need to find the angle and use a slowwwwww speed
+	bool firedFeed = 3;
+
 	while (IsAutonomous()){
 		
-		
+		//robotDrive->TankDrive(0.5, 0.5);
+		if (firedFeed > 0)
+		{
+			shotQueue->AddShot(feedShot);
+			firedFeed--;
+		}
 		UpdateAll();
 	}
 	
 	DEBUG_PRINT("AUTON Over\n");
 }
-
-
-	
 
 void OperatorControl(void){
 		
@@ -247,8 +254,8 @@ void OperatorControl(void){
 		while (IsOperatorControl())
 		{
 			
-			ProcessDriverControls();
-			ProcessShooterControls();
+			ProcessDriverControls(); //MAKES IT MOVE, does it here specifically
+			ProcessShooterControls(); //MAKES IT SHOOT, does it here specifically
 			
 			UpdateAll();
 			
@@ -393,7 +400,6 @@ void ProcessShooterControls(){
 		else if (shooterStart->HasFired()){
 			ballCannon->Calibrate();
 		}
-		
 		
 		break;
 		
