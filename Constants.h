@@ -43,8 +43,8 @@
 
 // The left and right motor banks share a PWM output using
 // a Y connector
-#define		PWM_LEFT_DRIVE	 	1
-#define 	PWM_RIGHT_DRIVE	 	2
+#define		PWM_LEFT_DRIVE	 	2
+#define 	PWM_RIGHT_DRIVE	 	1
 #define		SLOW_DRIVE_SCALER	0.5
 
 #define		PWM_LAUNCHER_LEFT	5
@@ -156,7 +156,7 @@ GetThrottle() reads analog triggers (positive right, neg left)
  * Smooth Drive
  * 
  * */
-#define LP_FILTER_TERMS 100
+#define LP_FILTER_TERMS 50
 
 
 // Shooted preset baselines

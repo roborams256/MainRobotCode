@@ -29,7 +29,7 @@ class RobotDemo : public SimpleRobot
 	 */
 	
 	enum DriverStates {
-		kDSFreeDriveFull,
+		kDSFreeDriveFull = 0,
 		kDSFreeDriveSlow,
 		kDSFreeDriveFiltered,
 		kDSBridgeTraverse,
@@ -37,8 +37,8 @@ class RobotDemo : public SimpleRobot
 		kDSGyroDrive
 	};
 	
-	// This flag is used if the robot is in a semi-auto mode like bridge and balance
-	bool  isDrivingSemiAutonomous; 
+	// This flag is used to distinguish if the robot is in a semi-auto mode like bridge and balance
+	bool  isDrivingTeleOp; 
 	
 	/* Shooter state is Offense/Defense and last target button pressed which corresponds to
 	 * baskets and firing positions. We need to track it for recording fine
@@ -58,7 +58,7 @@ class RobotDemo : public SimpleRobot
 		kSSDefense
 	};
 	
-	DriverStates 	driverState;
+	DriverStates 	driverState, savedDriverState;
 	ShooterStates 	shooterState;
 
 	DriverStationLCD *dsLCD;
@@ -91,6 +91,9 @@ class RobotDemo : public SimpleRobot
 	OneShotButton *driverB;
 	OneShotButton *driverX;
 	OneShotButton *driverY;
+	OneShotButton *driverRB;
+	OneShotButton *driverLB;
+	
 		
 	
 	ParameterStorage *pstore;
@@ -107,21 +110,100 @@ class RobotDemo : public SimpleRobot
 	Shot *shotArrayDefense[4];
 	int lastShotButtonPushed;
 	
-	
-	OneShotButton *lbButton;
-	OneShotButton *rbButton;
-	
 	FlexibleScaler *leftDriveFilter;
 	FlexibleScaler *rightDriveFilter;
 	
+	// The bridge traversal is so complex, it feels like it needs to be its own object
+	// but for now, keep it here.
+	enum BridgeTraversalStates {
+		kBTSDeployingBridgeActuator,
+		kBTSDrivingFrontWheelsOn,
+		kBTSDrivingToCenter,
+		kBTSRollingOff
+	};
 	
+	BridgeTraversalStates btState;
 	
 
 public:
 	
 	RobotDemo(void){
 		
+		DEBUG_PRINT("In Robot Demo constructor.\n");
+		// RobotDrive class is a built in class for controlling a basic drivetrain like ours
+		robotDrive = new RobotDrive(PWM_LEFT_DRIVE, PWM_RIGHT_DRIVE);	
+		robotDrive->SetExpiration(300);
+		robotDrive->SetSafetyEnabled(false);
 		
+		// Don't use the User watchdog timer (WDT). System WDT is still used and cannot be 
+		// interacted with.
+		GetWatchdog().SetEnabled(false);
+		
+		
+		// set up the gamepads
+		gamepadOne = new Joystick(1);
+		gamepadTwo = new Joystick(2);
+		
+		shooterA = new OneShotButton(gamepadTwo, A_BUTTON);
+		shooterB = new OneShotButton(gamepadTwo, B_BUTTON);
+		shooterX = new OneShotButton(gamepadTwo, X_BUTTON);
+		shooterY = new OneShotButton(gamepadTwo, Y_BUTTON);
+		shooterStart = new OneShotButton(gamepadTwo, START_BUTTON);
+		
+		// Driver button switches between the three teleop drive modes. Will ultimately be two.
+		driverRB = new OneShotButton( gamepadOne, RB_BUTTON  );
+		
+		// LB toggles in and out of gyro drive mode
+		driverLB = new OneShotButton( gamepadOne, LB_BUTTON  );
+		
+		driverY = new OneShotButton( gamepadOne, Y_BUTTON );
+				
+		
+		// The DriverStationLCD class lets us write to the driver station screen.
+		dsLCD = DriverStationLCD::GetInstance();
+		
+		// ParameterStorage mimics an ObjectiveC or Java Dictionary but is non-volatile.
+		// The class writes to the on-board Flash.
+		pstore = new ParameterStorage();
+		
+		
+		// BallCannon class controls the tilt and speed of the ball launch wheels
+		ballCannon = new BallCannon();
+		
+		// BallCollectionSystem controls the Sweeper, the Elevator and the Trigger Wheel
+		ballCollector = new BallCollectionSystem();
+		
+		// Two Gyros are used. The directionGyro is mounted horizontally and measures direction.
+		// The tiltGyro is mounted vertically and is used to measure front/back balance.
+		directionGyro = new Gyro(1);
+		tiltGyro = new Gyro(2);
+		
+		// Set the current angle for both to 0 degrees
+		directionGyro->Reset();
+		tiltGyro->Reset();
+		
+		// The ShotQueue queues up Shot objects and then performs the sequencing to make a shot.
+		// A Shot is an angle and a speed. The Shot queue makes sure the angle and speed are set before
+		// releasing a shot.
+		shotQueue = new ShotQueue(ballCollector, ballCannon);
+		
+		
+		ballCannon->Calibrate();	
+		
+		
+		// This is the low pass filter scaler. Number of terms is set in Constants.h
+		// More terms = smoother but slower.
+		// The lpFilter object is used to smooth out driver controls for smoother operation of the robot.
+		leftDriveFilter = new FlexibleScaler(FlexibleScaler::kLPFilter, 0.90);
+		rightDriveFilter = new FlexibleScaler(FlexibleScaler::kLPFilter, 0.90);
+		
+		LoadPresetShots();
+		lastShotButtonPushed = -1; // illegal state to start
+		
+		
+		// Used for testing
+		spareJag = new Jaguar(8);
+		dIn = new DigitalInput(14);
 		
 		
 	};
@@ -132,74 +214,7 @@ void RobotInit(){
 	
 	DEBUG_PRINT("In RobotInit:: \n");
 	
-	// RobotDrive class is a built in class for controlling a basic drivetrain like ours
-	robotDrive = new RobotDrive(PWM_LEFT_DRIVE, PWM_RIGHT_DRIVE);	
-	robotDrive->SetExpiration(300);
-	robotDrive->SetSafetyEnabled(false);
-	
-	// Don't use the User watchdog timer (WDT). System WDT is still used and cannot be 
-	// interacted with.
-	GetWatchdog().SetEnabled(false);
-	
-	
-	// set up the gamepads
-	gamepadOne = new Joystick(1);
-	gamepadTwo = new Joystick(2);
-	
-	shooterA = new OneShotButton(gamepadTwo, A_BUTTON);
-	shooterB = new OneShotButton(gamepadTwo, B_BUTTON);
-	shooterX = new OneShotButton(gamepadTwo, X_BUTTON);
-	shooterY = new OneShotButton(gamepadTwo, Y_BUTTON);
-	shooterStart = new OneShotButton(gamepadTwo, START_BUTTON);
-			
-	
-	// The DriverStationLCD class lets us write to the driver station screen.
-	dsLCD = DriverStationLCD::GetInstance();
-	
-	// ParameterStorage mimics an ObjectiveC or Java Dictionary but is non-volatile.
-	// The class writes to the on-board Flash.
-	pstore = new ParameterStorage();
-	
-	
-	// BallCannon class controls the tilt and speed of the ball launch wheels
-	ballCannon = new BallCannon();
-	
-	// BallCollectionSystem controls the Sweeper, the Elevator and the Trigger Wheel
-	ballCollector = new BallCollectionSystem();
-	
-	// Two Gyros are used. The directionGyro is mounted horizontally and measures direction.
-	// The tiltGyro is mounted vertically and is used to measure front/back balance.
-	directionGyro = new Gyro(1);
-	tiltGyro = new Gyro(2);
-	
-	// Set the current angle for both to 0 degrees
-	directionGyro->Reset();
-	tiltGyro->Reset();
-	
-	// The ShotQueue queues up Shot objects and then performs the sequencing to make a shot.
-	// A Shot is an angle and a speed. The Shot queue makes sure the angle and speed are set before
-	// releasing a shot.
-	shotQueue = new ShotQueue(ballCollector, ballCannon);
-	
-	
-	lbButton = new OneShotButton(gamepadOne, LB_BUTTON);
-	rbButton = new OneShotButton(gamepadOne, RB_BUTTON);
-	
-	ballCannon->Calibrate();	
-	
-	
-	// This is the low pass filter scaler. Number of terms is set in Constants.h
-	// More terms = smoother but slower.
-	// The lpFilter object is used to smooth out driver controls for smoother operation of the robot.
-	leftDriveFilter = new FlexibleScaler(FlexibleScaler::kLPFilter, 1.0);
-	rightDriveFilter = new FlexibleScaler(FlexibleScaler::kLPFilter, 1.0);
-	
-	LoadPresetShots();
-	lastShotButtonPushed = -1; // illegal state to start
-	
-	
-	// Used for testing
-	spareJag = new Jaguar(8);
+
 	
 }
 	
@@ -219,7 +234,7 @@ void Autonomous(void){
 	
 	while (IsAutonomous()){
 		
-		
+		printf("Light sensor at: %d\n", dIn->Get());
 		UpdateAll();
 	}
 	
@@ -235,18 +250,22 @@ void OperatorControl(void){
 		
 		// start in full drive mode
 		SetDriverState(kDSFreeDriveFiltered);
-		isDrivingSemiAutonomous = false;
+		isDrivingTeleOp = true;
+		DEBUG_PRINT("Starting operator controlled mode1.\n");
 		
 		// We wake up on the offense side of the field
 		SetShooterState(kSSOffense);
 				
 		// This is the main operation loop in tele operated mode
 		
+		
 		while (IsOperatorControl())
 		{
 			
+			
 			ProcessDriverControls();
-			ProcessShooterControls();
+			// ProcessShooterControls();
+			
 			
 			UpdateAll();
 			
@@ -324,41 +343,131 @@ void SetShooterState(ShooterStates ss){
 
 void ProcessDriverControls(){
 	
+	// Check the relevant driver buttons
+	
+	// RB controls the tele-op drive mode. Later this will be assigned to a ToggleButton
+	if (driverRB->HasFired()){
+		switch (driverState){
+		case kDSFreeDriveFull:
+			SetDriverState(kDSFreeDriveSlow);
+			break;
+		case kDSFreeDriveSlow:
+			SetDriverState(kDSFreeDriveFiltered);
+			break;
+		case kDSFreeDriveFiltered:
+			SetDriverState(kDSFreeDriveFull);
+			break;
+		default:
+			break;
+		}		
+	}
+	
+	
+	// LB toggles in and out of Gyro Drive
+	if (driverLB->HasFired()){
+		// if not in gyro, go
+		if ( driverState!=kDSGyroDrive ){
+			savedDriverState = driverState; // so we can restore on exit from Gyro
+			// current angle is te reference angle
+			directionGyro->Reset();
+			SetDriverState(kDSGyroDrive);
+		} 
+		else
+		{
+			// we are exiting gyro drive
+			SetDriverState(savedDriverState); // just restore the old one
+		}
+		
+	}
+	
+	// Look for balance button Y
+	
+	if (driverY->HasFired()){
+		savedDriverState = driverState;
+		SetDriverState(kDSBridgeBalance);
+		directionGyro->Reset();
+	}
 	
 	
 	switch (driverState){
+			
+		// TODO: add safety measures based on tiltGyro...correct based on tilt if needed.
 	
-	case kDSFreeDriveFull:
-		robotDrive->TankDrive(gamepadOne->GetRawAxis(LEFT_Y_AXIS), gamepadOne->GetRawAxis(RIGHT_Y_AXIS));
-		break;
-		
-	case kDSFreeDriveSlow:
-		robotDrive->TankDrive(gamepadOne->GetRawAxis(LEFT_Y_AXIS)*SLOW_DRIVE_SCALER, 
-				gamepadOne->GetRawAxis(RIGHT_Y_AXIS)*SLOW_DRIVE_SCALER);
-		break;
-		
-	case kDSFreeDriveFiltered:
-		
-		float ldrive = leftDriveFilter->Scale(gamepadOne->GetRawAxis(LEFT_Y_AXIS));
-		float rdrive = rightDriveFilter->Scale(gamepadOne->GetRawAxis(LEFT_Y_AXIS));
+		case kDSFreeDriveFull:
+			robotDrive->TankDrive(gamepadOne->GetRawAxis(LEFT_Y_AXIS), 
+					gamepadOne->GetRawAxis(RIGHT_Y_AXIS));
+			break;
 				
-		robotDrive->TankDrive(ldrive, rdrive);		
-		break;
+		case kDSFreeDriveSlow:
+			//TODO put the scaler in Constants
+			robotDrive->TankDrive(gamepadOne->GetRawAxis(LEFT_Y_AXIS)*0.70, 
+								gamepadOne->GetRawAxis(RIGHT_Y_AXIS)*0.70);
+			break;
+				
+		case kDSFreeDriveFiltered:
+				
+			float ldrive = leftDriveFilter->Scale(gamepadOne->GetRawAxis(LEFT_Y_AXIS));
+			float rdrive = rightDriveFilter->Scale(gamepadOne->GetRawAxis(RIGHT_Y_AXIS));
+						
+			robotDrive->TankDrive(ldrive, rdrive);		
+			break;
+				
+		case kDSGyroDrive:
+				
+			// the Drive method on RobotBase takes a speed and a curve angle. We get the speed from the right Y
+			// joystick (the left is ignored). The curve is the current angle away from zero divided by 10. 
+			// When gyro drive starts, the angle is reset to zero (see above). Then, any measured angle that
+			// isn't 0 degrees is an ERROR (the robot is not going straight). So by feeding a fraction of this
+			// error into the curve causes the robot to curve back to try to make this angle 0 degrees again
+			// and therefore go straight. Like magic :).
+			
+			robotDrive->Drive(gamepadOne->GetRawAxis(RIGHT_Y_AXIS), directionGyro->GetAngle()/10.0);
+			
+			break;
+			
+		case kDSBridgeTraverse:
 		
-	case kDSBridgeTraverse:
+			// this is a big chunk of code, so move it to a method for better readibility
+			//bridgeTraverseUpdate();
+			
+			break;
 		
-		break;
+		case kDSBridgeBalance:
+			
+			// In bridge balance mode, we'll be rocking back and forth using both gyros.
+			// But to stay in bridge balance mode, the Y button must be held down as a safety measure.
+			
+			if (!gamepadOne->GetRawButton(Y_BUTTON)){
+				// user has let go of Y button, so abandon balance mode
+				SetDriverState(kDSFreeDriveSlow); // is this what we want on exit?
+			}
+			else
+			{
+				// balance...
+				// Use the Drive method again. Speed/Direction is a fraction of the tilt angle.
+				// Perfect balance and the angle should be 0 so drive speed will be 0. If we're
+				// at a 30 degree angle then the drive will be 1.0 (or -1.0) which is max. This means
+				// the closer you are to a zero angle, the gentler the adjustment. Direction gyro drive
+				// works the same as Gyro drive.
+				
+				robotDrive->Drive( tiltGyro->GetAngle()/30.0, directionGyro->GetAngle()/10.0 );
+			}
+			
 		
-	case kDSBridgeBalance:
+			break;
+
+				 
+		default:
+			break;
 		
-		break;
 		
-	case kDSGyroDrive:
-		
-		break;
-		 
+		} 
 				
 	}
+
+void BridgeTraverseUpdate(){
+	
+	// we need to write this
 }
 	
 void ProcessShooterControls(){
