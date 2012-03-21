@@ -12,6 +12,7 @@
  */
 
 
+
 class TriggerWheel{
 	
 private:

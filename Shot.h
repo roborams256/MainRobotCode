@@ -1,6 +1,9 @@
 #ifndef SHOT
 #define SHOT
 
+/*
+ */
+
 class Shot {
 public:
 	float	speed;

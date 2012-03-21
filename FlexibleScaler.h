@@ -1,6 +1,8 @@
 #include <deque>
 #include "Constants.h"
 
+//
+
 class FlexibleScaler {
 	
 

@@ -1,5 +1,9 @@
 #include "WPILib.h"
 
+/*
+ * 
+ */
+
 class OneShotButton{
 	
 	bool armed;

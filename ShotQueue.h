@@ -8,6 +8,8 @@
 #include "Constants.h"
 #include <queue>
 
+//
+
 class ShotQueue {
 	
 private:
