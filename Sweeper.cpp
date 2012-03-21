@@ -1,5 +1,6 @@
 #include "Sweeper.h"
 
+
 Sweeper::Sweeper(int channel)
 {
 	//Set up the spike relay

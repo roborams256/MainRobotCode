@@ -1,6 +1,7 @@
 #include "LowPassFilter.h"
 
 
+
 LowPassFilter::LowPassFilter(int terms){
 	
 	//create a new array the lenght of terms

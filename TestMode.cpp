@@ -2,12 +2,13 @@
 
 void RobotDemo::TestModeSetup(void){
 	
-	printf("Test setup some shit\n");
+	printf("Test setup some stuff\n");
 };
 
 void RobotDemo::TestModeControlLoop(void){
 	
-	printf("Test some shit\n");
+	printf("Test some stuff\n");
+	
 };
 
 

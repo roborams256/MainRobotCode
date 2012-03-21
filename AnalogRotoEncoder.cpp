@@ -2,6 +2,7 @@
 
 
 
+
 AnalogRotoEncoder::AnalogRotoEncoder(UINT32 analogChannel){
 	
 	analogInput = new AnalogChannel(analogChannel);

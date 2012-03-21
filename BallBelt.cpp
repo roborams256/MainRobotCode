@@ -1,5 +1,6 @@
 #include "BallBelt.h"
 
+
 BallBelt::BallBelt(int channel)
 {
 	//Set up the spike relay

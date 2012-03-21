@@ -1,6 +1,7 @@
 #include "TriggerWheel.h"
 
 
+
 TriggerWheel::TriggerWheel(int spikeChannel, double launchTime){
 
 	triggerRelay = new Relay(SPIKE_TRIGGER);  // default should be both directions

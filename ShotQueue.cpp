@@ -84,4 +84,4 @@ void ShotQueue::Update(void){
 		break; // should never be here
 	}
 	
-}
+};

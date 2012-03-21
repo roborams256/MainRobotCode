@@ -1,6 +1,7 @@
 #import "FlexibleScaler.h"
 
 
+
 FlexibleScaler::FlexibleScaler(){
 	
 	scaleMode = kScaleLinear;

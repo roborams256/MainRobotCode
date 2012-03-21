@@ -5,6 +5,7 @@
 #define OK_ANGLE_ERROR 0.5
 #define PROP_DRIVE 0.30
 
+
 BallCannon::BallCannon(void){
 		
 	leftJag = new Jaguar( PWM_LAUNCHER_LEFT );

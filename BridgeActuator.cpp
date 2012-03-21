@@ -1,5 +1,6 @@
 #include "BridgeActuator.h"
 
+
 BridgeActuator::BridgeActuator(void){
 	
 	relay = new Relay(SPIKE_BRIDGE_ACTUATOR);

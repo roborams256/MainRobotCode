@@ -1,5 +1,6 @@
 #include "OneShotButton.h"
 
+
 OneShotButton::OneShotButton(Joystick *jstick, int rawButton){
 	
 	button = rawButton;

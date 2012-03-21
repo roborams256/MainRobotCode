@@ -17,4 +17,4 @@ void testAxis(Joystick *joystick){
 			printf("Stick %d is at %f\n", i, joystick->GetRawAxis(i));
 	
 	
-}
+};
