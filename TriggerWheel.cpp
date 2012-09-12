@@ -26,6 +26,7 @@ void TriggerWheel::Off(void){
 
 void TriggerWheel::Hold(void){
 		
+	// was kReverse with Ice wheel
 	triggerRelay->Set(Relay::kReverse);
 		
 }
@@ -51,7 +52,6 @@ void TriggerWheel::FireSemiAuto()
 	DEBUG_PRINT("FIRE semiauto\n");
 
 	
-	
 	if (semi) return; //don't allow re-firing
 	
 	timer->Stop();
@@ -63,24 +63,7 @@ void TriggerWheel::FireSemiAuto()
 	
 }
 
-void TriggerWheel::FirePulse(void)
-{
-	pulse = true;
-	timer->Reset();
-	timer->Start();
-}
 
-void TriggerWheel::StopPulse(void)
-{
-	pulse = false;
-	timer->Stop();
-	timer->Reset();
-}
-
-bool TriggerWheel::Pulsing(void)
-{
-	return pulse;
-}
 
 bool TriggerWheel::IsFiring(){
 	return semi;
@@ -88,6 +71,7 @@ bool TriggerWheel::IsFiring(){
 
 void TriggerWheel::Update()
 {
+
 	//DEBUG_PRINT("Timer %lf\n Semi %d\n",timer->Get(), semi);
 	if (semi && timer->HasPeriodPassed(launchPeriod))
 	{
@@ -102,15 +86,5 @@ void TriggerWheel::Update()
 	
 	return;
 	
-	// TODO: Robert, what is pulse?
 	
-	if (pulse)
-	{
-		int result = static_cast<int>(timer->Get() / launchPeriod);
-		float mod = timer->Get() - static_cast<float>(result) * launchPeriod;
-		triggerRelay->Set((mod > (launchPeriod / 2)) ? (Relay::kOff) : (Relay::kForward));
-	}
-	
-	if (!pulse && !semi)
-		StopPulse();
 }

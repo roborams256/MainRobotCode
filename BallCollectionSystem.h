@@ -4,7 +4,7 @@
 #import "WPILib.h"
 #import "Sweeper.h"
 #import "BallBelt.h"
-#import "TriggerWheel.h"
+#import "TriggerWheelVictor.h"
 
 /*
  * 
@@ -25,7 +25,7 @@ public:
 	int ballsInChute;
 	BallBelt *ballBelt;
 	Sweeper *sweeper;
-	TriggerWheel *triggerWheel;
+	TriggerWheelVictor *triggerWheel;
 	
 	BallCollectionSystem(void);
 	

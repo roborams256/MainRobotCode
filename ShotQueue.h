@@ -34,7 +34,13 @@ public:
 	
 	ShotQueue(BallCollectionSystem *bcs, BallCannon *bcan);
 	int AddShot(Shot *shot);
+	void PurgeQueue(void);
 	void Update(void);
+	
+	//Added at Madera 2012 by Robert
+	
+	int NumShots(void);
+	bool IsEmpty(void);
 	
 };
 

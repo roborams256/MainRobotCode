@@ -13,7 +13,7 @@ BallCollectionSystem::BallCollectionSystem(void){
 	sweeper->Off();
 	
 	
-	triggerWheel = new TriggerWheel(SPIKE_TRIGGER, TRIGGER_WHEEL_PERIOD_S);
+	triggerWheel = new TriggerWheelVictor(VICTOR_TRIGGER, TRIGGER_WHEEL_PERIOD_S);
 	
 	
 	//TODO Logic for counter
@@ -49,6 +49,8 @@ void BallCollectionSystem::TotallyOff(void){
 
 
 void BallCollectionSystem::Fire(void){
+	
+	
 	
 	triggerWheel->FireSemiAuto();
 	

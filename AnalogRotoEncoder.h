@@ -14,7 +14,7 @@ class AnalogRotoEncoder {
 	
 	AnalogChannel *analogInput;
 	float lastReading;
-	float upLimitVoltage;
+	float zeroAngleVoltage;
 	float angle;
 	
 	
@@ -28,6 +28,7 @@ public:
 	void SetStartAngle();
 	void Update();
 	float GetRaw();
+	void AutoSetAngleFromZeroVoltage(float zeroVoltage);
 	
 	
 };

@@ -26,15 +26,27 @@ void AnalogRotoEncoder::Update(){
 	
 }
 
-
+// TODO this code is crap and has replications from fixing autocal
 
 float AnalogRotoEncoder::GetRaw(){
 	
 	float rval = analogInput->GetVoltage();
 	
-	angle = UPPER_LIMIT_ANGLE_DEGREES +(rval-upLimitVoltage)*DEGREES_PER_VOLT;
+	float vdelta = analogInput->GetVoltage() - zeroAngleVoltage;
+		
+	angle = vdelta*DEGREES_PER_VOLT;
 	
 	return rval;
+	
+}
+
+void AnalogRotoEncoder::AutoSetAngleFromZeroVoltage(float zeroVoltage){
+	
+	zeroAngleVoltage = zeroVoltage;
+	float vdelta = analogInput->GetVoltage() - zeroAngleVoltage;
+		
+	angle = vdelta*DEGREES_PER_VOLT;
+	
 	
 }
 
@@ -43,8 +55,8 @@ void AnalogRotoEncoder::SetStartAngle(void){
 	// Call this method to set the starting voltage for the encoder at the upper limit
 	//angle = UPPER_LIMIT_ANGLE_DEGREES;
 	
-	angle = UPPER_LIMIT_ANGLE_DEGREES;
-	upLimitVoltage = analogInput->GetVoltage();
+	//angle = UPPER_LIMIT_ANGLE_DEGREES;
+	//upLimitVoltage = analogInput->GetVoltage();
 	
 	
 }

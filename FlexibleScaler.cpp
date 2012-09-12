@@ -53,6 +53,18 @@ float FlexibleScaler::Scale(float input){
 		
 	case kLPFilter:
 		
+		// Try weighting the first term much more?
+		
+		if (fabs(lastFilterVal)<0.15){
+			
+			// we are going slow so speed up response
+			for (int j=0;j<10;j++)
+			{
+				filterQueue.push_front(input);
+				filterQueue.pop_back(); // get rid of the oldest
+			}
+		}
+		
 		filterQueue.push_front(input);
 		filterQueue.pop_back(); // get rid of the oldest
 		
@@ -61,7 +73,10 @@ float FlexibleScaler::Scale(float input){
 		for (int i=0; i<filterLength; i++)
 			rval = rval + filterQueue[i];
 		
-		return rval/filterLength;
+		
+		lastFilterVal = rval/filterLength;
+		
+		return lastFilterVal;
 		
 		break;
 		

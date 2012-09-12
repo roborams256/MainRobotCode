@@ -16,6 +16,12 @@ int ShotQueue::AddShot(Shot *shot){
 	
 }
 
+void ShotQueue::PurgeQueue(void){
+	
+	while (!shots.empty())
+		shots.pop();
+}
+
 void ShotQueue::Update(void){
 	
 	// We always process the top of the stack
@@ -85,3 +91,18 @@ void ShotQueue::Update(void){
 	}
 	
 };
+
+//Added at Madera 2012 by Robert
+//It's necissary for AutonBridgeMode, and is useful for other things
+
+int ShotQueue::NumShots(void){
+	
+	return shots.size();
+	
+}
+
+bool ShotQueue::IsEmpty(void){
+	
+	return shots.empty();
+
+}

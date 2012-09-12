@@ -1,5 +1,6 @@
 #include <deque>
 #include "Constants.h"
+#include <math.h>
 
 //
 
@@ -18,6 +19,8 @@ public:
 	ScaleModes scaleMode;
 	
 	float linearScaleValue;
+	
+	float lastFilterVal;
 	
 	std::deque<float> filterQueue;
 	int filterLength;

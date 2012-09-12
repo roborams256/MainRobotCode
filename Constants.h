@@ -4,21 +4,6 @@
  * Includes #defines for various PWM, Digital I/O Channels, etc.
  * 
  * 
- * Leroy's Variable Speed Motors (on Jaguars):
- * 	
- * 	One PWM on Y: Drive Front Left  /  Drive Back Left
- * 	One PWM on Y: Drive Front Right /  Drive Back Right
- * 	 	
- *  Launcher Right Wheel  /  Launcher Left Wheel
- *  
- *  Launcher Angle Adjust
- *  
- * Leroy's Single Speed Motors (on Spikes):
- * 
- *  Ball Sweep
- *  Ball Trigger Wheel
- * 
- * 
  */
 
 // Get the raw axis and button numbers
@@ -29,7 +14,7 @@
 
 
 
-#define VERBOSE_DEBUG
+//#define VERBOSE_DEBUG
 
 #ifdef VERBOSE_DEBUG
 #define DEBUG_PRINT(args...) printf(args)
@@ -37,105 +22,30 @@
 #define DEBUG_PRINT
 #endif
 
+// dI
+#define		SLOW_DRIVE_SCALER	0.8
 
 
-// PWM Channels
+#define     BRIDGE_SLAPPER_LOWER_V 0.23
+#define		BRIDGE_SLAPPER_UPPER_V 4.75
 
-
-// The left and right motor banks share a PWM output using
-// a Y connector
-#define		PWM_LEFT_DRIVE	 	2
-#define 	PWM_RIGHT_DRIVE	 	1
-#define		SLOW_DRIVE_SCALER	0.5
-
-#define		PWM_LAUNCHER_LEFT	5
-#define		PWM_LAUNCHER_RIGHT	6
-#define		PWM_LAUNCH_ANGLE	7
-
-
-// Ball Collection System constants
-
-#define 	SPIKE_BELT				3
-#define		SPIKE_SWEEPER			2
-
-#define		SPIKE_TRIGGER			5
-#define 	TRIGGER_WHEEL_PERIOD_S	1.0  // 1 second wheel spin
-
-
-// Bridge Actuator
-#define SPIKE_BRIDGE_ACTUATOR 	6
-#define DIG_IN_TOP_SENSOR 		11
-#define DIG_IN_BOTTOM_SENSOR 	12
+#define		HOLD_TRIGGER_SPEED  -0.4
+#define     LAUNCH_TRIGGER_SPEED 1.0
+#define 	TRIGGER_WHEEL_PERIOD_S	0.5  // 0.5 second wheel spin
 
 
 // Shooter
-#define ANALOG_INPUT_SHOOTER_ANGLE  4
-#define DIG_IN_ZERO_SENSOR 	1	
-#define ANGLE_JAG_SCALER 0.35
 
-#define UPPER_LIMIT_ANGLE_DEGREES  63.0 	// Measured 
-#define LOWER_LIMIT_ANGLE_DEGREES -68.0 	// Measured
+
+#define ANGLE_JAG_SCALER 0.35
+#define ZERO_ANGLE_VOLTAGE 1.39 // Measureds
+#define UPPER_LIMIT_ANGLE_DEGREES  -15.0 	// Measured 
+#define LOWER_LIMIT_ANGLE_DEGREES   68.0 	// Measured
 #define PARALLEL_VOLTAGE  2.15			// MEasured
 #define UP_45_VOLTAGE 3.57
 #define DEGREES_PER_VOLT	31.69 //(45/(UP_45_VOLTAGE-PARALLEL_VOLTAGE)) // At about parallel we are at about 2V less 
 
 
-
-// Ultrasound
-
-#define AIN_ULTRASONIC 8
-#define USOUND_INCH_PER_V 0.0098
-
-
-
-/*
- * 
- * Sensors
- * 
- * 	Rotation:
- * 		* Transmission left
- * 		* Transmission right
- * 		* Launch angle
- * 		
- * 	Opto:
- * 		* Ball counter
- * 		
- * 	Microswitch:
- * 		* Launch angle limit
- * 		
- * 	Positional:
- * 		* Gyro
- * 		* Accelerometer
- * 		
- * 
- */
-
-// The roto encoder is on...
-#define DIO_ENCODER_A 14
-#define DIO_ENCODER_B 13
-
-
-#define 	DIG_IN_BALL_SENSOR	4
-
-/*
- * Gamepad channels
- * 
- * 
-Raw Axis 1 = Left X (left is negative)
-Raw Axis 2 = Left Y (up is negative)
-Raw Axis 3 = Left trigger (0 to 1)
-	     Right trigger (0 to -1)
-Raw Axis 4 = Right X (left is neg)
-Raw Axis 5 = Right Y
-
-Raw 6 = D-Pad L/R
-
-GetThrottle() reads analog triggers (positive right, neg left)
-*/
-
-// Scaling factor controls what percent of the joystick motion gets applied
-// to the tank drive. 1.0 = 100%, 0.5 = 50% etc.
-#define JOYSTICK_DRIVE_SCALE_FACTOR 0.4
 
 
 // Roto encoder
@@ -166,8 +76,54 @@ GetThrottle() reads analog triggers (positive right, neg left)
 #define BASELINE_OFFENSE_A_BUTTON_SPEED 0.35
 #define BASELINE_OFFENSE_A_BUTTON_ANGLE 58.0
 
-// Go deep on defense
+// High Basket from bumper
 #define BASELINE_DEFENSE_A_BUTTON_SPEED 0.85
 #define BASELINE_DEFENSE_A_BUTTON_ANGLE 45.0
 
 
+
+/*******************************
+ * 
+ * Signal assignments
+ * 
+ * *****************************/
+
+// The left and right motor banks share a PWM output using
+// a Y connector
+#define		PWM_LEFT_DRIVE	 	2
+#define 	PWM_RIGHT_DRIVE	 	1
+#define		PWM_LAUNCHER_LEFT	5
+#define		PWM_LAUNCHER_RIGHT	6
+#define		PWM_LAUNCH_ANGLE	7
+#define 	VICTOR_TRIGGER		4
+
+#define 	SPIKE_BELT				3
+#define		SPIKE_SWEEPER			2
+#define		SPIKE_TRIGGER			8 // not used anymo
+#define 	SPIKE_BRIDGE_ACTUATOR 	1
+
+#define 	ANALOG_INPUT_BRIDGE 	7
+
+#define 	ANALOG_INPUT_SHOOTER_ANGLE  4
+
+#define 	DIG_IN_ZERO_SENSOR 	14	
+
+// The roto encoder is on...
+#define		DIO_ENCODER_A 1
+#define 	DIO_ENCODER_B 2
+
+
+#define 	DIG_IN_BALL_SENSOR	14
+
+#define		AUTON_SWITCH_INPUT 	4
+#define		AUTON_SWITCH_2 10
+
+#define MULTI_AUTON
+
+//Robert, at Madera 2012
+#define		ABM_DISTANCE	40  //91" from the end of the key to the bridge. make sure to compensate for error, the length of the tipper, and other space requirements
+//85 is a number I'm just guessing at. We'll probably need to actually do testing to get it right.
+
+#define 	TEAM_BRIDGE_DISTANCE 96 // bit of a guess based on geometry. 108" is the 16' minus key width (48") minus frame width of 36" with some deployer extended
+
+ 
